@@ -1,0 +1,36 @@
+Klasy glowne:
+- BirdsEyeView - odpowiada za transformacje pojedynczej klatki na widok z lotu ptaka,
+  metody:
+  - kalibracja (rozne metody)
+  - transformacja
+
+
+- LaneDetect - samo wykrywanie pasa - obraz z lotu ptaka na wejscie, sledzenie pasa z wykorzystaniem przyblizania wielomianem
+  metody:
+  - aktualne przyblizenie pasa - zwraca dwa wielomiany
+  - inicjalizacja - histogram dolnej polowy obrazu
+  - kontrola utraty pasa - jesli tak to uruchomienie ponowne inicjalizacji (prywatna?)
+  - metoda przeprowadzajaca update okienek
+  - zmienna struktura - wskazniki na obiekty Window, czyli aktualne okienka na krawedziach pasa
+
+- PolynomialApproxymation - przyblizenie vectora punktow z wejscia wielomianem okreslonego stopnia
+
+
+Klasy pomocnicze:
+- szablon Polynomial - wielomiany o roznych typach wspolczynnikow
+
+- klasa FourPoints - przechowuje 4 punkty, GroupRep (czworki moga sie powtarzac), przypisanie czworki do danych wymiarow obrazu,
+  dzieki temu kontrola, czy sa w obrebie obrazu.
+  Klasa moze udostepniac wiele prostych geometrycznych metod, jak znajdowanie srodka czworokata czy wyznaczanie przeciecia prostych wyznaczonych przez dwie pary punktow
+
+- Window (klasa ogolnie tworzaca histogramy niezerowych pikseli w kolumnach) - klasa dziedziczaca po klasie FourPoints
+  klasa bioraca na wejscie obraz i koordynaty okienka, zwraca przesuniete Window, koordynaty srodka okienka lub piki histogramu
+
+
+Funkcje wirtualne - na przyklad w przypadku klas FourPoints Window nadpisywanie np geometrycznej metody - w Okienku moze zwracac specyficzne informacje
+
+Obsluga wyjatkow - np bledy wczytywanego obrazu (czarna klatka)
+
+Wspolpraca ze strumieniami - np w klasie FourPoints, w mozliwej klasie obslugujacej wejscie/wyjscie
+
+Kontenery - vector w klasie wielomian, wtedy iteratory przy przechodzeniu po wektorze
