@@ -1,12 +1,15 @@
 #include "BirdsEyeView.h"
 
 
+using namespace cv;
+using namespace std;
+
 BirdsEyeView::BirdsEyeView()
 {
     inputSet = 0;
 }
 
-BirdsEyeView::BirdsEyeView(cv::Mat input)
+BirdsEyeView::BirdsEyeView(Mat input)
 {
     BirdsEyeView();
     setInput(input);
@@ -17,37 +20,40 @@ BirdsEyeView::~BirdsEyeView()
 
 }
 
-BirdsEyeView::setInput(cv::Mat input)
+BirdsEyeView::setInput(Mat input)
 {
     src = input;
     inputSet = 1;
     roi.setBoundaries(src.cols, src.rows);
+    transformed = Mat::zeros(src.cols, src.rows, src.type);
+    result = Mat::zeros(src.cols, src.rows, src.type);
     performTransform();
 }
 
-cv::Mat BirdsEyeView::getTransformed()
+Mat BirdsEyeView::getTransformed()
 {
     return transformed;
 }
 
-cv::Mat BirdsEyeView::getResult()
+Mat BirdsEyeView::getResult()
 {
     return result;
 }
 
-void BirdsEyeView::setRoi(FourPoints newRoi)
+void BirdsEyeView::setRoi(vector<Point> roiCorners)
 {
-    newRoi.setBoundaries(src.cols, src.rows);
-    roi = newRoi;
-}
-
-FourPoints BirdsEyeView::getRoi()
-{
-    return roi;
+    roi.setBoundaries(src.cols, src.rows);
+    roi.clear();
+    roi.push_back(roiCorners);
 }
 
 
 void BirdsEyeView::performTransform()
 {
+//actual opencv stuff
+}
 
+void BirdsEyeView::calibrate()
+{
+  //find lines, four points, use class FourPoints - find intersection
 }

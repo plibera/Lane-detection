@@ -24,7 +24,7 @@ FourPoints::FourPoints(Point bounds)
 FourPoints::FourPoints(vector<Point> input, Point bounds)
 {
     setBoundaries(bounds);
-    add(input);
+    push_back(input);
 }
 
 FourPoints::FourPoints(Point a, Point b, Point c, Point d, Point bounds)
@@ -35,7 +35,7 @@ FourPoints::FourPoints(Point a, Point b, Point c, Point d, Point bounds)
     temp.push_back(b);
     temp.push_back(c);
     temp.push_back(d);
-    add(temp);
+    push_back(temp);
 }
 
 FourPoints::~FourPoints()
@@ -47,17 +47,17 @@ FourPoints::~FourPoints()
     }
 }
 
-void FourPoints::add(Point a, Point b, Point c, Point d)
+void FourPoints::push_back(Point a, Point b, Point c, Point d)
 {
     vector<Point> temp;
     temp.push_back(a);
     temp.push_back(b);
     temp.push_back(c);
     temp.push_back(d);
-    add(temp);
+    push_back(temp);
 }
 
-void FourPoints::add(vector<Point> input)
+void FourPoints::push_back(vector<Point> input)
 {
     if(input.size() != 4)
         return;
@@ -107,4 +107,107 @@ vector<Point> getPoints(int index)
         a.push_back(points[index]->point[0]);
 
     return a;
+}
+
+void FourPoints::pop_back()
+{
+    if(points.size() == 0)
+        return;
+    if(points[points.size()-1]->count > 0)
+        points[points.size()-1]->count--;
+    else
+        delete points[points.size()-1];
+    points.pop_back();
+}
+
+void FourPoints::clear()
+{
+    while(!points.empty())
+    {
+        pop_back();
+    }
+}
+
+void FourPoints::setBoundaries(int x, int y)
+{
+    Point a(x, y);
+    setBoundaries(a);
+}
+
+void setBoundaries(Point newBoundary)
+{
+    newBoundary.x = max(0, newBoundary.x-1);
+    newBoundary.y = max(0, newBoundary.y-1);
+    boundary = newBoundary;
+    for(size_t i = 0; i < points.size(); ++i)
+    {
+        for(int j = 0; j < 4; ++j)
+        {
+            points[i]->point[j].x = min(boundary.x, max(0, points[i]->point[j].x));
+            points[i]->point[j].y = min(boundary.y, max(0, points[i]->point[j].y));
+        }
+    }
+}
+
+Point FourPoints::getBoundaries()
+{
+    return boundary;
+}
+
+bool FourPoints::withinBoundaries(Point a)
+{
+    return a.x >= 0 && a.x <= boundary.x && a.y >= 0 && a.y <= boundary.y;
+}
+
+Point FourPoints::polygonCentre(int index)
+{
+    index = max(0, min(points.size()-1, index));
+    Point result(0,0);
+    for(int j = 0; j < 4; ++j)
+    {
+        result.x += points[index]->point[j].x;
+        result.y += points[index]->point[j].y;
+    }
+    result.x /= 4;
+    result.y /= 4;
+
+    return result;
+}
+
+Point FourPoints:linesIntersection(int index, int choosePair)
+{
+    index = max(0, min(points.size()-1, index));
+    if(choosePair != 1 && choosePair != 2)
+        choosePair = 3;
+    Point chosen[4];
+    for(int j = 0; j < 4; ++j)
+    {
+        chosen[j] = points[index]->point[j];
+    }
+    if(choosePair != 3)
+    {
+        Point temp;
+        temp = chosen[3];
+        chosen[3] = chosen[choosePair];
+        chosen[choosePair] = temp;
+    }
+
+    int a, b, c, d;
+    a = b = c = d = 0;
+
+    a = chosen[0].x - chosen[3].x;
+    b = chosen[0].y - chosen[3].y;
+    c = chosen[1].x - chosen[2].x;
+    d = chosen[1].y - chosen[2].y;
+
+    if(a*d == c*b)
+    {
+        return Point(-1, -1);
+    }
+    int k = (d*(chosen[2].x-chosen[3].x)+c*(chosen[3].y-chosen[2].y))/(a*d-c*b);
+    int l = (b*(chosen[2].x-chosen[3].x)+a*(chosen[3].y-chosen[2].y))/(a*d-c*b);
+
+    Point result(chosen[3].x + k*a, chosen[3].y + k*b);
+
+    return result;
 }

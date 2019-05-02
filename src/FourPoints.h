@@ -15,8 +15,9 @@ class FourPoints
 
         Points();
         ~Points();
-    }
-    std::vector<Points*> points;
+    };
+    
+    std::vector< Points* > points;
     cv::Point boundary;
 
 public:
@@ -25,13 +26,14 @@ public:
     FourPoints(cv::Point a, cv::Point b, cv::Point c, cv::Point d, cv::Point bounds);
     ~FourPoints();
 
-    void add(std::vector<cv::Point> input);
-    void add(cv::Point a, cv::Point b, cv::Point c, cv::Point d);
+    void push_back(std::vector<cv::Point> input);
+    void push_back(cv::Point a, cv::Point b, cv::Point c, cv::Point d);
 
     std::vector<cv::Point> getPoints(int index);
 
     //removes points that were added last
-    void removePoints();
+    void pop_back();
+    void clear();
 
     void setBoundaries(int x, int y);
     void setBoundaries(cv::Point newBoundary);
@@ -43,7 +45,7 @@ public:
     //choosePair sets with which point point number 0 is going to create a line with
     //default pairs are 0 with 3 and 1 with 2
     cv::Point linesIntersection(int index, int choosePair = 3);
-}
+};
 
 
 #endif

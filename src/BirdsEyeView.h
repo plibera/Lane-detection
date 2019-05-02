@@ -3,6 +3,7 @@
 
 #include <opencv2/opencv.hpp>
 #include <stdio.h>
+#include "FourPoints.h"
 
 
 class BirdsEyeView
@@ -19,15 +20,16 @@ private:
 
 public:
     BirdsEyeView();
-    BirdsEyeView(Mat input);
+    BirdsEyeView(cv::Mat input);
     ~BirdsEyeView();
 
-    void setInput(Mat input);
+    void setInput(cv::Mat input);
     cv::Mat getTransformed();
     cv::Mat getResult();
 
-    void setRoi(FourPoints newRoi);
-    FourPoints getRoi();
+    //Only set roi if you have accurate coordinates and/or there aren't any straight
+    //lines to perform calibration on
+    void setRoi(std::vector<cv::Point> roiCorners);
 
     void calibrate();
 };
