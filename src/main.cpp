@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <opencv2/opencv.hpp>
+#include "BirdsEyeView.h"
 
 
 using namespace cv;
@@ -27,7 +28,9 @@ int main(int argc, char** argv )
     vid >> frame;
     while(!frame.empty())
     {
-        imshow("Frame", frame);
+
+
+
         char c = (char)waitKey(30);
         if(c == 27)//break when user presses ESC
             break;
