@@ -16,11 +16,12 @@ class FourPoints
         Points();
         ~Points();
     };
-    
+
     std::vector< Points* > points;
     cv::Point boundary;
 
 public:
+    FourPoints();
     FourPoints(cv::Point bounds);
     FourPoints(std::vector<cv::Point> input, cv::Point bounds);
     FourPoints(cv::Point a, cv::Point b, cv::Point c, cv::Point d, cv::Point bounds);
@@ -34,6 +35,7 @@ public:
     //removes points that were added last
     void pop_back();
     void clear();
+    int size();
 
     void setBoundaries(int x, int y);
     void setBoundaries(cv::Point newBoundary);

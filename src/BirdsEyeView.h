@@ -2,9 +2,12 @@
 #define BIRDSEYEVIEW_H
 
 #include <opencv2/opencv.hpp>
+#include "opencv2/highgui.hpp"
+#include "opencv2/imgproc.hpp"
 #include <stdio.h>
 #include "FourPoints.h"
 
+#define THRESHOLD 180
 
 class BirdsEyeView
 {

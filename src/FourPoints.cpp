@@ -15,6 +15,11 @@ FourPoints::Points::~Points()
     delete[] point;
 }
 
+FourPoints::FourPoints()
+{
+    Point a(0,0);
+    setBoundaries(a);
+}
 
 FourPoints::FourPoints(Point bounds)
 {
@@ -67,7 +72,7 @@ void FourPoints::push_back(vector<Point> input)
        if(!withinBoundaries(input[i]))
        {
            input[i].x = min(boundary.x, max(0, input[i].x));
-           input[i].y = min(bpundary.y, max(0, input[i].y));
+           input[i].y = min(boundary.y, max(0, input[i].y));
        }
     }
 
@@ -99,12 +104,12 @@ void FourPoints::push_back(vector<Point> input)
     }
 }
 
-vector<Point> getPoints(int index)
+vector<Point> FourPoints::getPoints(int index)
 {
-    index = max(0, min(points.size()-1, index));
+    index = max(0, min((int)points.size()-1, index));
     vector<Point> a;
     for(int i = 0; i < 4; ++i)
-        a.push_back(points[index]->point[0]);
+        a.push_back(points[index]->point[i]);
 
     return a;
 }
@@ -128,13 +133,18 @@ void FourPoints::clear()
     }
 }
 
+int FourPoints::size()
+{
+    return (int)points.size();
+}
+
 void FourPoints::setBoundaries(int x, int y)
 {
     Point a(x, y);
     setBoundaries(a);
 }
 
-void setBoundaries(Point newBoundary)
+void FourPoints::setBoundaries(Point newBoundary)
 {
     newBoundary.x = max(0, newBoundary.x-1);
     newBoundary.y = max(0, newBoundary.y-1);
@@ -161,7 +171,7 @@ bool FourPoints::withinBoundaries(Point a)
 
 Point FourPoints::polygonCentre(int index)
 {
-    index = max(0, min(points.size()-1, index));
+    index = max(0, min((int)points.size()-1, index));
     Point result(0,0);
     for(int j = 0; j < 4; ++j)
     {
@@ -174,9 +184,9 @@ Point FourPoints::polygonCentre(int index)
     return result;
 }
 
-Point FourPoints:linesIntersection(int index, int choosePair)
+Point FourPoints::linesIntersection(int index, int choosePair)
 {
-    index = max(0, min(points.size()-1, index));
+    index = max(0, min((int)points.size()-1, index));
     if(choosePair != 1 && choosePair != 2)
         choosePair = 3;
     Point chosen[4];
