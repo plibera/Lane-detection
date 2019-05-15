@@ -22,7 +22,7 @@ template <class Type>
 Type & Polynomial<Type>::operator[](int i)
 {
   if(i < 0 || i > deg)
-    return coeffs[0];//throw...
+    throw "Requested index out of memory";
 
   return coeffs[i];
 }

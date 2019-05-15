@@ -2,7 +2,7 @@
 #include <fstream>
 #include <opencv2/opencv.hpp>
 //#include "BirdsEyeView.h"
-//#include "Polynomial.h"
+#include "Polynomial.h"
 
 #define ASCII_0 48
 
@@ -10,8 +10,12 @@ using namespace cv;
 using namespace std;
 
 
+void testPolynomials();//tests for Polynomial.h
+
+
 int main(int argc, char** argv )
 {
+    testPolynomials();
     if(argc < 3)
     {
         cout<<"Input not specified"<<endl;
@@ -63,7 +67,6 @@ int main(int argc, char** argv )
         //imshow("Frame", frame);//causes leaks
         //bird.setInput(frame);
 
-        //Polynomial <int> w;
 
 
         //char c = (char)waitKey(1);
@@ -75,4 +78,30 @@ int main(int argc, char** argv )
         if(frame_id == 100) break;
     }
     return 0;
+}
+
+
+void testPolynomials()
+{
+  int errors = 0;
+
+  Polynomial <int> w (3);
+  w[0] = -1;
+  w[1] = 2;
+  w[2] = 4.5;
+  w[3] = 23;
+  if(w[0] != -1)
+  {
+    errors++;
+  }
+  w[0] = w.degree();
+
+  Polynomial<double> v;
+  w[0] = v[0];
+  v[0] = w[1];
+  if(v[0] != 2)
+  {
+    errors++;
+  }
+  assert(errors == 0);
 }
