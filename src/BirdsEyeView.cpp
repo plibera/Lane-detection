@@ -61,11 +61,10 @@ void BirdsEyeView::performTransform()
     for(int j = 0; j < 4; ++j)
     {
         srcver[j] = roiPoints[j];
-        cout<<srcver[j].x<<" "<<srcver[j].y<<endl;
     }
     Point2f dstver[4];
-    dstver[0] = Point(2*src.cols/5, src.rows/4);
-    dstver[1] = Point(3*src.cols/5, src.rows/4);
+    dstver[0] = Point(2*src.cols/5, 0);//src.rows/4);
+    dstver[1] = Point(3*src.cols/5, 0);//src.rows/4);
     dstver[2] = Point(3*src.cols/5, src.rows);
     dstver[3] = Point(2*src.cols/5, src.rows);
 

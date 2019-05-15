@@ -18,6 +18,7 @@ Klasy glowne:
 
 Klasy pomocnicze:
 - szablon Polynomial - wielomiany o roznych typach wspolczynnikow
+  //tu tez mozna dac wyjatki
 
 - klasa FourPoints - przechowuje 4 punkty, GroupRep (czworki moga sie powtarzac), przypisanie czworki do danych wymiarow obrazu,
   dzieki temu kontrola, czy sa w obrebie obrazu.

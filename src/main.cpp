@@ -2,6 +2,7 @@
 #include <fstream>
 #include <opencv2/opencv.hpp>
 #include "BirdsEyeView.h"
+#include "Polynomial.h"
 
 #define ASCII_0 48
 
@@ -60,6 +61,9 @@ int main(int argc, char** argv )
     {
         imshow("Frame", frame);
         bird.setInput(frame);
+
+        Polynomial <int> w;
+
 
         char c = (char)waitKey(30);
         if(c == 27)//break when user presses ESC
