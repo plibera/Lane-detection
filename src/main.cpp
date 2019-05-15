@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <fstream>
 #include <opencv2/opencv.hpp>
-//#include "BirdsEyeView.h"
+#include "BirdsEyeView.h"
 #include "Polynomial.h"
 
 #define ASCII_0 48
@@ -16,6 +16,7 @@ void testPolynomials();//tests for Polynomial.h
 int main(int argc, char** argv )
 {
     testPolynomials();
+
     if(argc < 3)
     {
         cout<<"Input not specified"<<endl;
@@ -57,9 +58,9 @@ int main(int argc, char** argv )
     //namedWindow("Frame", WINDOW_NORMAL);//causes leaks
     //resizeWindow("Frame", 1080, 720);//no point using without a window
 
-    //BirdsEyeView bird;
+    BirdsEyeView bird;
     vid >> frame;
-    //bird.setInput(frame);
+    bird.setInput(frame);
     //bird.setRoi(roi);
     int frame_id = 0;
     while(!frame.empty())
@@ -69,7 +70,7 @@ int main(int argc, char** argv )
 
 
 
-        //char c = (char)waitKey(1);
+        //char c = (char)waitKey(1);//causes leaks
         //if(c == 27)//break when user presses ESC
           //  break;
 

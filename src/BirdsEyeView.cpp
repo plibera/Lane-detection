@@ -24,14 +24,14 @@ void BirdsEyeView::setInput(Mat input)
 {
     if(input.channels() > 1)
     {
-         cvtColor(input, input, COLOR_BGR2GRAY);
+         cvtColor(input, input, COLOR_BGR2GRAY);//causes leaks
     }
     src = input;
     inputSet = 1;
     roi.setBoundaries(src.cols, src.rows);
     transformed = Mat::zeros(src.rows, src.cols, src.type());
     result = Mat::zeros(src.rows, src.cols, src.type());
-    performTransform();
+    //performTransform();
 }
 
 Mat BirdsEyeView::getTransformed()
@@ -70,12 +70,12 @@ void BirdsEyeView::performTransform()
 
     Mat M = getPerspectiveTransform(srcver, dstver);
     warpPerspective(src, transformed, M, transformed.size(), INTER_LINEAR, BORDER_CONSTANT);
-    namedWindow("transformed", WINDOW_NORMAL);
-    imshow("transformed", transformed);
+    //namedWindow("transformed", WINDOW_NORMAL);
+    //imshow("transformed", transformed);
 
     threshold( transformed, result, THRESHOLD, 255, 0 );
-    namedWindow("result", WINDOW_NORMAL);
-    imshow("result", result);
+    //namedWindow("result", WINDOW_NORMAL);
+    //imshow("result", result);
 }
 
 void BirdsEyeView::calibrate()
