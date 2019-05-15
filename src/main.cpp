@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <fstream>
 #include <opencv2/opencv.hpp>
-#include "BirdsEyeView.h"
-#include "Polynomial.h"
+//#include "BirdsEyeView.h"
+//#include "Polynomial.h"
 
 #define ASCII_0 48
 
@@ -49,27 +49,30 @@ int main(int argc, char** argv )
     }
 
     Mat frame;
-    namedWindow("Frame", WINDOW_NORMAL);
-    resizeWindow("Frame", 1080, 720);
 
-    BirdsEyeView bird;
+    //namedWindow("Frame", WINDOW_NORMAL);//causes leaks
+    //resizeWindow("Frame", 1080, 720);//no point using without a window
 
+    //BirdsEyeView bird;
     vid >> frame;
-    bird.setInput(frame);
-    bird.setRoi(roi);
+    //bird.setInput(frame);
+    //bird.setRoi(roi);
+    int frame_id = 0;
     while(!frame.empty())
     {
-        imshow("Frame", frame);
-        bird.setInput(frame);
+        //imshow("Frame", frame);//causes leaks
+        //bird.setInput(frame);
 
-        Polynomial <int> w;
+        //Polynomial <int> w;
 
 
-        char c = (char)waitKey(30);
-        if(c == 27)//break when user presses ESC
-            break;
+        //char c = (char)waitKey(1);
+        //if(c == 27)//break when user presses ESC
+          //  break;
 
         vid >> frame;
+        cout<<"Frame id: "<<frame_id++<<endl;
+        if(frame_id == 100) break;
     }
     return 0;
 }
