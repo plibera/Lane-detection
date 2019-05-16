@@ -55,28 +55,28 @@ int main(int argc, char** argv )
 
     Mat frame;
 
-    //namedWindow("Frame", WINDOW_NORMAL);//causes leaks
-    //resizeWindow("Frame", 1080, 720);//no point using without a window
+    namedWindow("Frame", WINDOW_NORMAL);//causes leaks
+    resizeWindow("Frame", 1080, 720);//no point using without a window
 
     BirdsEyeView bird;
     vid >> frame;
     bird.setInput(frame);
-    //bird.setRoi(roi);
+    bird.setRoi(roi);
     int frame_id = 0;
     while(!frame.empty())
     {
-        //imshow("Frame", frame);//causes leaks
-        //bird.setInput(frame);
+        imshow("Frame", frame);//causes leaks
+        bird.setInput(frame);
 
 
 
-        //char c = (char)waitKey(1);//causes leaks
-        //if(c == 27)//break when user presses ESC
-          //  break;
+        char c = (char)waitKey(1);//causes leaks
+        if(c == 27)//break when user presses ESC
+            break;
 
         vid >> frame;
         cout<<"Frame id: "<<frame_id++<<endl;
-        if(frame_id == 100) break;
+        //if(frame_id == 100) break;
     }
     return 0;
 }

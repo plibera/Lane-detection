@@ -31,7 +31,7 @@ void BirdsEyeView::setInput(Mat input)
     roi.setBoundaries(src.cols, src.rows);
     transformed = Mat::zeros(src.rows, src.cols, src.type());
     result = Mat::zeros(src.rows, src.cols, src.type());
-    //performTransform();
+    performTransform();
 }
 
 Mat BirdsEyeView::getTransformed()
@@ -69,13 +69,13 @@ void BirdsEyeView::performTransform()
     dstver[3] = Point(2*src.cols/5, src.rows);
 
     Mat M = getPerspectiveTransform(srcver, dstver);
-    warpPerspective(src, transformed, M, transformed.size(), INTER_LINEAR, BORDER_CONSTANT);
-    //namedWindow("transformed", WINDOW_NORMAL);
-    //imshow("transformed", transformed);
+    warpPerspective(src, transformed, M, transformed.size(), INTER_LINEAR, BORDER_CONSTANT);//causes leaks
+    namedWindow("transformed", WINDOW_NORMAL);//causes leaks
+    imshow("transformed", transformed);//causes leaks
 
-    threshold( transformed, result, THRESHOLD, 255, 0 );
-    //namedWindow("result", WINDOW_NORMAL);
-    //imshow("result", result);
+    threshold( transformed, result, THRESHOLD, 255, 0 );//causes possible leaks
+    namedWindow("result", WINDOW_NORMAL);//causes leaks
+    imshow("result", result);//causes leaks
 }
 
 void BirdsEyeView::calibrate()
