@@ -2,7 +2,9 @@
 #include <fstream>
 #include <opencv2/opencv.hpp>
 #include "BirdsEyeView.h"
+#include "FourPoints.h"
 #include "Polynomial.h"
+#include "Window.h"
 
 #define ASCII_0 48
 
@@ -53,24 +55,37 @@ int main(int argc, char** argv )
         return -1;
     }
 
-    Mat frame;
+    Mat frame, birdView, histogram;
 
     namedWindow("Frame", WINDOW_NORMAL);//causes leaks
     resizeWindow("Frame", 1080, 720);//no point using without a window
+
+    namedWindow("Histogram", WINDOW_NORMAL);
 
     BirdsEyeView bird;
     vid >> frame;
     bird.setInput(frame);
     bird.setRoi(roi);
+    birdView = bird.getResult();
+
+    cout<<frame.cols<<" "<<frame.rows<<endl;
+
+    Window initialWindow(birdView);
+    initialWindow.push_back(Point(0,0), Point(frame.cols-1, 0), Point(frame.cols-1, frame.rows-1), Point(0, frame.rows-1));
     int frame_id = 0;
     while(!frame.empty())
     {
         imshow("Frame", frame);//causes leaks
         bird.setInput(frame);
+        birdView = bird.getResult();
 
 
+        initialWindow.setInput(birdView);
+        initialWindow.createHistograms();
+        histogram = initialWindow.histToImg();
+        imshow("Histogram", histogram);
 
-        char c = (char)waitKey(1);//causes leaks
+        char c = (char)waitKey(10);//causes leaks
         if(c == 27)//break when user presses ESC
             break;
 

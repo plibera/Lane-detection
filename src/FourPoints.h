@@ -8,6 +8,7 @@
 //Every coordinate must be between 0 and boundary
 class FourPoints
 {
+protected:
     struct Points//group representation
     {
         cv::Point* point;
@@ -42,7 +43,7 @@ public:
     cv::Point getBoundaries();
     bool withinBoundaries(cv::Point a);
 
-    cv::Point polygonCentre(int index);//average of coordinates
+    virtual cv::Point polygonCentre(int index);//average of coordinates
 
     //choosePair sets with which point point number 0 is going to create a line with
     //default pairs are 0 with 3 and 1 with 2

@@ -1,3 +1,6 @@
+Zmien warunki min max na wyjatki
+
+
 Klasy glowne:
 - BirdsEyeView - odpowiada za transformacje pojedynczej klatki na widok z lotu ptaka,
   metody:
@@ -17,8 +20,7 @@ Klasy glowne:
 
 
 Klasy pomocnicze:
-- szablon Polynomial - wielomiany o roznych typach wspolczynnikow
-  //tu tez mozna dac wyjatki
+- szablon Polynomial - wielomiany o roznych typach wspolczynnikow, wyjatki przy wywolaniu komorki poza zakresem
 
 - klasa FourPoints - przechowuje 4 punkty, GroupRep (czworki moga sie powtarzac), przypisanie czworki do danych wymiarow obrazu,
   dzieki temu kontrola, czy sa w obrebie obrazu.

@@ -81,7 +81,7 @@ void BirdsEyeView::performTransform()
 void BirdsEyeView::calibrate()
 {
   //find lines, four points, use class FourPoints - find intersection
-    /*Mat edges;
+    Mat edges;
     Canny(src, edges, 50, 200, 3);
     vector<Vec4i> lines;
     HoughLinesP( edges, lines, 1, CV_PI/180, 80, 30, 10 );
@@ -105,5 +105,5 @@ void BirdsEyeView::calibrate()
           Point( chosenLines[i][2], chosenLines[i][3]), Scalar(128), 3, 8 );
     }
     namedWindow("lines", WINDOW_NORMAL);
-    imshow("lines", show);*/
+    imshow("lines", show);
 }
