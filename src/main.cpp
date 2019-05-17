@@ -5,6 +5,7 @@
 #include "FourPoints.h"
 #include "Polynomial.h"
 #include "Window.h"
+#include "PolyFit.h"
 
 #define ASCII_0 48
 
@@ -13,11 +14,13 @@ using namespace std;
 
 
 void testPolynomials();//tests for Polynomial.h
+void testPolyFit();
 
 
 int main(int argc, char** argv )
 {
     testPolynomials();
+    testPolyFit();
 
     if(argc < 3)
     {
@@ -120,4 +123,37 @@ void testPolynomials()
     errors++;
   }
   assert(errors == 0);
+}
+
+void testPolyFit()
+{
+  PolyFit polyfit;
+  vector<Point> a;
+  a.push_back(Point(10, 160));
+  a.push_back(Point(150, 190));
+  a.push_back(Point(300, 250));
+  a.push_back(Point(450, 350));
+  a.push_back(Point(550, 250));
+
+  polyfit.setInput(a);
+
+  Polynomial<double> result = polyfit.solve();
+  cout<<result[0]<<" "<<result[1]<<" "<<result[2]<<endl;
+
+  Mat polyMat(480, 640, CV_8UC3, Scalar(0, 0, 0));
+
+  for(int i = 0; i < a.size(); ++i)
+  {
+    circle(polyMat, a[i], 3, Scalar(255, 0, 0), -1);
+  }
+  for(int i = 0; i < polyMat.cols; ++i)
+  {
+    int y = result[0] + result[1]*i + result[2]*i*i + result[3]*i*i*i;
+    if(y >= 0 && y < polyMat.rows)
+      polyMat.at<Vec3b>(Point(i, y)) = Vec3b(0, 0, 255);
+  }
+
+  namedWindow("PolyFit", WINDOW_NORMAL);
+  imshow("PolyFit", polyMat);
+  waitKey(0);
 }

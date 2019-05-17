@@ -24,7 +24,10 @@ Window::Window(Mat image, Point a, Point b, Point c, Point d)
     FourPoints(a, b, c, d, Point(src.rows, src.cols));
 }
 
-Window::~Window(){}
+Window::~Window()
+{
+  //cout<<"Window destructor"<<endl;
+}
 
 Point Window::polygonCentre(int index)
 {

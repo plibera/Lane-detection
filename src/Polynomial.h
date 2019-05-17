@@ -1,17 +1,20 @@
 #ifndef POLYNOMIAL_H
 #define POLYNOMIAL_H
 
-#define DEGREE 2
+#include <stdio.h>
+#include <vector>
+
+#define DEGREE 3
 
 template <class Type>
 class Polynomial
 {
   int deg;
-  Type *coeffs;
+  std::vector<Type> coeffs;
 
 public:
-  Polynomial(int d = DEGREE): deg(std::max(0, d)), coeffs(new Type[deg+1]) {}
-  ~Polynomial() { delete[] coeffs; }
+  Polynomial(int d = DEGREE);
+  ~Polynomial(){}//std::cout<<"Polynomial destructor"<<std::endl;}
 
   Type & operator[](int i);
   int degree() {return deg; }
@@ -27,5 +30,12 @@ Type & Polynomial<Type>::operator[](int i)
   return coeffs[i];
 }
 
+template <class Type>
+Polynomial<Type>::Polynomial(int d)
+{
+  deg = std::max(0, d);
+  for(int i = 0; i <= deg; ++i)
+    coeffs.push_back(0);
+}
 
 #endif
