@@ -3,8 +3,9 @@
 
 #include <stdio.h>
 #include <vector>
+#include <math.h>
 
-#define DEGREE 3
+#define DEGREE 2
 
 template <class Type>
 class Polynomial
@@ -18,6 +19,7 @@ public:
 
   Type & operator[](int i);
   int degree() {return deg; }
+  Type value(int x);
 };
 
 
@@ -36,6 +38,17 @@ Polynomial<Type>::Polynomial(int d)
   deg = std::max(0, d);
   for(int i = 0; i <= deg; ++i)
     coeffs.push_back(0);
+}
+
+template <class Type>
+Type Polynomial<Type>::value(int x)
+{
+  Type ret = 0;
+  for(int i = 0; i <= DEGREE; ++i)
+  {
+    ret += coeffs[i] * pow(x, i);
+  }
+  return ret;
 }
 
 #endif

@@ -145,7 +145,7 @@ void LaneDetect::initLines()
   }
 
 
-  Mat debug;
+  /*Mat debug;
   cvtColor(input, debug, COLOR_GRAY2BGR);
   for(int i = 0; i < roadLines.size(); ++i)
   {
@@ -164,10 +164,110 @@ void LaneDetect::initLines()
     }
   }
   namedWindow("Windows", WINDOW_NORMAL);
-  imshow("Windows", debug);
+  imshow("Windows", debug);*/
 }
 
 void LaneDetect::updateLines()
 {
+  Mat debug;
+  cvtColor(input, debug, COLOR_GRAY2BGR);
 
+  int blackWindowIdx = WINDOWS;
+  vector<int> histogram;
+  vector<int>histPrefixSum;
+  Point currentCentre;
+  int lookupVal;
+  int middleIndex;
+  for(int i = 0; i < roadLines.size(); ++i)
+  {
+    roadLines[i].createHistograms();
+    blackWindowIdx = WINDOWS;
+    histogram.clear();
+    histPrefixSum.clear();
+    for(int windowNum = 0; windowNum < WINDOWS; ++windowNum)
+    {
+      histogram = roadLines[i].getHistogram(windowNum);
+      histPrefixSum.clear();
+      histPrefixSum.push_back(histogram[0]);
+      for(int j = 1; j < histogram.size(); ++j)
+      {
+        histPrefixSum.push_back(histPrefixSum[j-1] + histogram[j]);
+      }
+
+
+      if(histPrefixSum[histPrefixSum.size()-1] == 0)
+      {
+        blackWindowIdx = windowNum;
+        break;
+      }
+
+
+      lookupVal = histPrefixSum[histPrefixSum.size()-1] / 2;
+      middleIndex = histPrefixSum.size()-1;
+      for(int j = 0; j < histPrefixSum.size(); ++j)
+      {
+        if(histPrefixSum[j] > lookupVal)
+        {
+          middleIndex = j;
+          break;
+        }
+      }
+      currentCentre = roadLines[i].getWindowCentre(windowNum);
+      currentCentre.x = currentCentre.x - WINDOW_WIDTH/2 + middleIndex;
+
+      if(roadLines.size() > 1)
+      {
+        Point border;
+        if(i==0)
+        {
+          border = roadLines[1].getWindowCentre(windowNum);
+          currentCentre.x = min(currentCentre.x, border.x-WINDOW_WIDTH);
+        }
+        if(i==1)
+        {
+          border = roadLines[0].getWindowCentre(windowNum);
+          currentCentre.x = max(currentCentre.x, border.x+WINDOW_WIDTH);
+        }
+        currentCentre.x = min(input.cols-1-WINDOW_WIDTH/2, max(WINDOW_WIDTH/2, currentCentre.x));
+      }
+      
+      roadLines[i].setWindowCentre(windowNum, currentCentre);
+    }
+
+    vector<Point> lanePoints;
+    for(int j = 0; j < blackWindowIdx; ++j)
+    {
+      Point a = roadLines[i].getWindowCentre(j);
+      swap(a.x, a.y);
+      lanePoints.push_back(a);
+    }
+
+    PolyFit polyfit(lanePoints);
+    Polynomial<double> laneSolution = polyfit.solve();
+
+    for(int j = blackWindowIdx; j < WINDOWS; ++j)
+    {
+      Point a = roadLines[i].getWindowCentre(j);
+      a.x = laneSolution.value(a.y);
+      roadLines[i].setWindowCentre(j, a);
+    }
+
+    for(int y = 0; y < input.rows; ++y)
+    {
+      double x = laneSolution.value(y);
+      if(x >= 0 && x < input.cols) debug.at<Vec3b>(Point(x, y)) = Vec3b(0, 0, 255);
+    }
+    for(int j = 0; j < roadLines[i].size(); ++j)
+    {
+      Point a, b, c;
+      c = roadLines[i].getWindowCentre(j);
+      a.x = c.x - WINDOW_WIDTH/2;
+      a.y = c.y - WINDOW_HEIGHT/2;
+      b.x = c.x + WINDOW_WIDTH/2;
+      b.y = c.y + WINDOW_HEIGHT/2;
+      rectangle(debug, a, b, Scalar(255, 0, 0), 5);
+    }
+  }
+  namedWindow("PolyFitted", WINDOW_NORMAL);
+  imshow("PolyFitted", debug);
 }
