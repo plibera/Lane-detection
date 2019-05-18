@@ -93,7 +93,7 @@ int main(int argc, char** argv )
         histogram = initialWindow.histToImg();
         imshow("Histogram", histogram);*/
 
-        char c = (char)waitKey(10);//causes leaks
+        char c = (char)waitKey(0);//causes leaks
         if(c == 27)//break when user presses ESC
             break;
 

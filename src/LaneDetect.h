@@ -10,7 +10,7 @@
 
 #define WINDOW_WIDTH 100
 #define WINDOW_HEIGHT 50
-#define WINDOWS 8
+#define WINDOWS 6
 
 class LaneDetect
 {

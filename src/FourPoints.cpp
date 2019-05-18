@@ -43,6 +43,30 @@ FourPoints::FourPoints(Point a, Point b, Point c, Point d, Point bounds)
     push_back(temp);
 }
 
+
+FourPoints::FourPoints(const FourPoints& ck)//copying constructor
+{
+  this->boundary = ck.boundary;
+  this->clear();
+  for(int i = 0; i < ck.points.size(); ++i)
+  {
+    this->push_back(ck.points[i]->point[0], ck.points[i]->point[1], ck.points[i]->point[2], ck.points[i]->point[3]);
+  }
+}
+
+FourPoints& FourPoints::operator=(const FourPoints& ck)//copying =
+{
+  this->boundary = ck.boundary;
+  this->clear();
+  for(int i = 0; i < ck.points.size(); ++i)
+  {
+    this->push_back(ck.points[i]->point[0], ck.points[i]->point[1], ck.points[2]->point[2], ck.points[3]->point[3]);
+  }
+}
+
+//FourPoints(FourPoints&& rk);//moving constructor
+//FourPoints& operator=(FourPoints&& rk);//moving =
+
 FourPoints::~FourPoints()
 {
   //cout<<"FourPoints destructor"<<endl;

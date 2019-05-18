@@ -26,6 +26,12 @@ public:
     FourPoints(cv::Point bounds);
     FourPoints(std::vector<cv::Point> input, cv::Point bounds);
     FourPoints(cv::Point a, cv::Point b, cv::Point c, cv::Point d, cv::Point bounds);
+
+    FourPoints(const FourPoints& ck);//copying constructor
+    FourPoints& operator=(const FourPoints& ck);//copying =
+    //FourPoints(FourPoints&& rk);//moving constructor
+    //FourPoints& operator=(FourPoints&& rk);//moving =
+
     ~FourPoints();
 
     void push_back(std::vector<cv::Point> input);
