@@ -3,25 +3,22 @@
 using namespace std;
 using namespace cv;
 
-Window::Window(Mat image)
+Window::Window(Mat image) : FourPoints(Point(image.rows, image.cols))
 {
     src = image;
-    FourPoints(Point(src.cols, src.rows));
     hist = Mat::zeros(src.rows, src.cols, src.type());
 }
 
-Window::Window(Mat image, vector<Point> input)
+Window::Window(Mat image, vector<Point> input) : FourPoints(input, Point(image.cols, image.rows))
 {
     src = image;
     hist = Mat::zeros(src.rows, src.cols, src.type());
-    FourPoints(input, Point(src.rows, src.cols));
 }
 
-Window::Window(Mat image, Point a, Point b, Point c, Point d)
+Window::Window(Mat image, Point a, Point b, Point c, Point d) : FourPoints(a, b, c, d, Point(image.cols, image.rows))
 {
     src = image;
     hist = Mat::zeros(src.rows, src.cols, src.type());
-    FourPoints(a, b, c, d, Point(src.rows, src.cols));
 }
 
 Window::~Window()
@@ -54,15 +51,24 @@ void Window::createHistogram(int index)
 {
   if(index < 0 || index >= histograms.size())
     return;
+  if(index < 0 || index >= points.size())
+    return;
+
+  //cout<<points[index]->point[0].x<<" "<<points[index]->point[0].y<<endl;
+  //cout<<points[index]->point[2].x<<" "<<points[index]->point[2].y<<endl<<endl;
 
   int count = 0;
-  for(int x = 0; x < src.cols; ++x)
+  for(int x = points[index]->point[0].x; x < points[index]->point[2].x; ++x)
   {
     count = 0;
-    for(int y = 0; y < src.rows; ++y)
+    for(int y = points[index]->point[0].y; y < points[index]->point[2].y; ++y)
     {
       if(src.at<uchar>(Point(x, y)) == 255)
+      {
         count++;
+        //if(y > 420)
+          //count += 7;
+      }
     }
     histograms[index].push_back(count);
   }

@@ -1,4 +1,5 @@
 Zmien warunki min max na wyjatki
+Polynomial ze wskaznikiem i konstruktorami odpowiednimi
 
 
 Klasy glowne:
@@ -16,7 +17,7 @@ Klasy glowne:
   - metoda przeprowadzajaca update okienek
   - zmienna struktura - wskazniki na obiekty Window, czyli aktualne okienka na krawedziach pasa
 
-- PolynomialApproxymation - przyblizenie vectora punktow z wejscia wielomianem okreslonego stopnia
+- PolyFit - przyblizenie vectora punktow z wejscia wielomianem okreslonego stopnia
 
 
 Klasy pomocnicze:

@@ -10,6 +10,8 @@ class Window : public FourPoints
   cv::Mat hist;//Mat to show a resulting image
   std::vector< std::vector<int> > histograms;//vector storing histograms for every window
 
+  void createHistogram(int index);
+
 public:
   Window(cv::Mat image);
   Window(cv::Mat image, std::vector<cv::Point> input);
@@ -19,7 +21,6 @@ public:
   virtual cv::Point polygonCentre(int index);//the centre of the window
 
   void createHistograms();
-  void createHistogram(int index);
 
   std::vector<int> getHistogram(int index);
   std::vector<std::vector<int> > getHistograms();

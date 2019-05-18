@@ -6,6 +6,7 @@
 #include "Polynomial.h"
 #include "Window.h"
 #include "PolyFit.h"
+#include "LaneDetect.h"
 
 #define ASCII_0 48
 
@@ -20,7 +21,7 @@ void testPolyFit();
 int main(int argc, char** argv )
 {
     testPolynomials();
-    testPolyFit();
+    //testPolyFit();
 
     if(argc < 3)
     {
@@ -63,7 +64,7 @@ int main(int argc, char** argv )
     namedWindow("Frame", WINDOW_NORMAL);//causes leaks
     resizeWindow("Frame", 1080, 720);//no point using without a window
 
-    namedWindow("Histogram", WINDOW_NORMAL);
+    //namedWindow("Histogram", WINDOW_NORMAL);
 
     BirdsEyeView bird;
     vid >> frame;
@@ -73,8 +74,10 @@ int main(int argc, char** argv )
 
     cout<<frame.cols<<" "<<frame.rows<<endl;
 
-    Window initialWindow(birdView);
-    initialWindow.push_back(Point(0,0), Point(frame.cols-1, 0), Point(frame.cols-1, frame.rows-1), Point(0, frame.rows-1));
+    //Window initialWindow(birdView);
+    //initialWindow.push_back(Point(0,0), Point(frame.cols-1, 0), Point(frame.cols-1, frame.rows-1), Point(0, frame.rows-1));
+
+    LaneDetect lanes;
     int frame_id = 0;
     while(!frame.empty())
     {
@@ -82,11 +85,13 @@ int main(int argc, char** argv )
         bird.setInput(frame);
         birdView = bird.getResult();
 
+        lanes.setInput(birdView);
+        lanes.initLines();
 
-        initialWindow.setInput(birdView);
+        /*initialWindow.setInput(birdView);
         initialWindow.createHistograms();
         histogram = initialWindow.histToImg();
-        imshow("Histogram", histogram);
+        imshow("Histogram", histogram);*/
 
         char c = (char)waitKey(10);//causes leaks
         if(c == 27)//break when user presses ESC

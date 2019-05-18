@@ -45,7 +45,7 @@ FourPoints::FourPoints(Point a, Point b, Point c, Point d, Point bounds)
 
 FourPoints::~FourPoints()
 {
-//  cout<<"FourPoints destructor"<<endl;
+  //cout<<"FourPoints destructor"<<endl;
     while(points.size() > 0)
     {
         delete points[points.size()-1];
