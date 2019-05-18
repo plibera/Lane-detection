@@ -73,15 +73,15 @@ void LaneDetect::initLines()
   for(int i = 0; i < newCentres.size(); ++i)
   {
     roi.clear();
-    roi.push_back(Point(newCentres[i]-WINDOW_WIDTH/2, 430), Point(newCentres[i]+WINDOW_WIDTH/2, 430),
-                  Point(newCentres[i]+WINDOW_WIDTH/2, 480), Point(newCentres[i]-WINDOW_WIDTH/2, 480));
+    roi.push_back(Point(newCentres[i]-WINDOW_WIDTH/2, input.rows-WINDOW_HEIGHT), Point(newCentres[i]+WINDOW_WIDTH/2, input.rows-WINDOW_HEIGHT),
+                  Point(newCentres[i]+WINDOW_WIDTH/2, input.rows), Point(newCentres[i]-WINDOW_WIDTH/2, input.rows));
     roi.createHistograms();
     histogram = roi.getHistogram(0);
     for(int j = 0; j < histogram.size(); ++j)
     {
       if(histogram[j] > 0)
       {
-        lineStart.push_back(Point(newCentres[i], 455));
+        lineStart.push_back(Point(newCentres[i], input.rows-WINDOW_HEIGHT/2));
         break;
       }
     }
@@ -97,8 +97,8 @@ void LaneDetect::initLines()
     currentCentre = lineStart[i];
     for(int windowNum = 0; windowNum < WINDOWS; ++windowNum)
     {
-      a.push_back(Point(currentCentre.x-WINDOW_WIDTH/2, 430-windowNum*WINDOW_HEIGHT), Point(currentCentre.x+WINDOW_WIDTH/2, 430-windowNum*WINDOW_HEIGHT),
-                  Point(currentCentre.x+WINDOW_WIDTH/2, 480-windowNum*WINDOW_HEIGHT), Point(currentCentre.x-WINDOW_WIDTH/2, 480-windowNum*WINDOW_HEIGHT));
+      a.push_back(Point(currentCentre.x-WINDOW_WIDTH/2, input.rows-(windowNum+1)*WINDOW_HEIGHT), Point(currentCentre.x+WINDOW_WIDTH/2, input.rows-(windowNum+1)*WINDOW_HEIGHT),
+                  Point(currentCentre.x+WINDOW_WIDTH/2, input.rows-windowNum*WINDOW_HEIGHT), Point(currentCentre.x-WINDOW_WIDTH/2, input.rows-windowNum*WINDOW_HEIGHT));
       a.createHistograms();
       histogram = a.getHistogram(windowNum);
 
@@ -167,4 +167,7 @@ void LaneDetect::initLines()
   imshow("Windows", debug);
 }
 
-void updateLines();
+void LaneDetect::updateLines()
+{
+
+}
