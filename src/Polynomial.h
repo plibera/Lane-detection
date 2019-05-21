@@ -11,11 +11,13 @@ template <class Type>
 class Polynomial
 {
   int deg;
-  std::vector<Type> coeffs;
+  Type* coeffs;
 
 public:
-  Polynomial(int d = DEGREE);
-  ~Polynomial(){}//std::cout<<"Polynomial destructor"<<std::endl;}
+  Polynomial(int d = DEGREE): deg(std::max(0,d)), coeffs(new Type[deg+1]){}
+  Polynomial(const Polynomial<Type>& ck);//copying constructor
+  Polynomial<Type>& operator=(const Polynomial<Type>& ck);//copying =
+  ~Polynomial(){ delete[] coeffs; }
 
   Type & operator[](int i);
   int degree() {return deg; }
@@ -32,13 +34,6 @@ Type & Polynomial<Type>::operator[](int i)
   return coeffs[i];
 }
 
-template <class Type>
-Polynomial<Type>::Polynomial(int d)
-{
-  deg = std::max(0, d);
-  for(int i = 0; i <= deg; ++i)
-    coeffs.push_back(0);
-}
 
 template <class Type>
 Type Polynomial<Type>::value(int x)
@@ -49,6 +44,28 @@ Type Polynomial<Type>::value(int x)
     ret += coeffs[i] * pow(x, i);
   }
   return ret;
+}
+
+template <class Type>
+Polynomial<Type>::Polynomial(const Polynomial<Type>& ck)//copying constructor
+{
+  this->deg = ck.deg;
+  this->coeffs = new Type[deg+1];
+  for(int i = 0; i <= deg; ++i)
+  {
+    this->coeffs[i] = ck.coeffs[i];
+  }
+}
+
+template <class Type>
+Polynomial<Type>& Polynomial<Type>::operator=(const Polynomial<Type>& ck)//copying =
+{
+  Polynomial <Type> p(ck.degree);
+  for(int i = 0; i <= deg; ++i)
+  {
+    p.coeffs[i] = ck.coeffs[i];
+  }
+  return p;
 }
 
 #endif

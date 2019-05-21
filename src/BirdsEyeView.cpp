@@ -17,7 +17,7 @@ BirdsEyeView::BirdsEyeView(Mat input)
 
 BirdsEyeView::~BirdsEyeView()
 {
-//cout<<"BirdsEyeView destructor"<<endl;
+
 }
 
 void BirdsEyeView::setInput(Mat input)

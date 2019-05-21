@@ -1,6 +1,8 @@
+dewarp, pas na zielono, a potem REFACTORING
+
 Zmien warunki min max na wyjatki
 Polynomial ze wskaznikiem i konstruktorami odpowiednimi
-Zmienic wymiary obrazu hardo wpisane na define
+
 
 Klasy glowne:
 - BirdsEyeView - odpowiada za transformacje pojedynczej klatki na widok z lotu ptaka,

@@ -230,7 +230,7 @@ void LaneDetect::updateLines()
         }
         currentCentre.x = min(input.cols-1-WINDOW_WIDTH/2, max(WINDOW_WIDTH/2, currentCentre.x));
       }
-      
+
       roadLines[i].setWindowCentre(windowNum, currentCentre);
     }
 
@@ -269,5 +269,6 @@ void LaneDetect::updateLines()
     }
   }
   namedWindow("PolyFitted", WINDOW_NORMAL);
+  resizeWindow("PolyFitted", 1080, 720);
   imshow("PolyFitted", debug);
 }

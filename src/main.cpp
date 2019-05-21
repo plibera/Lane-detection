@@ -13,15 +13,18 @@
 using namespace cv;
 using namespace std;
 
-
-void testPolynomials();//tests for Polynomial.h
+void testBirdsEyeView();
+void testFourPoints();
+void testWindow();
+void testPolynomial();
 void testPolyFit();
+void testLaneDetect();
+void performTests();
 
 
 int main(int argc, char** argv )
 {
-    testPolynomials();
-    //testPolyFit();
+    performTests();
 
     if(argc < 3)
     {
@@ -83,7 +86,6 @@ int main(int argc, char** argv )
     lanes.setInput(birdView);
     lanes.initLines();
 
-    waitKey(0);
 
     //Window initialWindow(birdView);
     //initialWindow.push_back(Point(0,0), Point(frame.cols-1, 0), Point(frame.cols-1, frame.rows-1), Point(0, frame.rows-1));
@@ -115,7 +117,44 @@ int main(int argc, char** argv )
 }
 
 
-void testPolynomials()
+
+void performTests()
+{
+  testBirdsEyeView();
+  cout<<"BirdsEyeView"<<endl;
+  testFourPoints();
+  //testWindow();
+  testPolynomial();
+  cout<<"Polynomial"<<endl;
+  testPolyFit();
+  cout<<"Polyfit"<<endl;
+  //testLaneDetect();
+}
+
+void testBirdsEyeView()
+{
+  BirdsEyeView bird;
+  Mat mat;
+  mat = bird.getTransformed();
+  mat = bird.getResult();
+  vector<Point> a;
+  for(int i = 0; i < 4; ++i)
+    a.push_back(Point(0,0));
+  bird.setRoi(a);
+
+  mat = Mat::zeros(100, 100, CV_8UC3);
+  bird.setInput(mat);
+
+  BirdsEyeView bird2(mat);
+  mat = bird2.getResult();
+}
+
+void testFourPoints()
+{
+
+}
+
+void testPolynomial()
 {
   int errors = 0;
 
@@ -137,6 +176,12 @@ void testPolynomials()
   {
     errors++;
   }
+  v[1] = w[3];
+
+  Polynomial <double> u = v;
+  if(u[1] != 23)
+    errors++;
+
   assert(errors == 0);
 }
 
@@ -151,7 +196,6 @@ void testPolyFit()
   a.push_back(Point(550, 250));
 
   polyfit.setInput(a);
-
   Polynomial<double> result = polyfit.solve();
   cout<<result[0]<<" "<<result[1]<<" "<<result[2]<<endl;
 
@@ -163,11 +207,10 @@ void testPolyFit()
   }
   for(int i = 0; i < polyMat.cols; ++i)
   {
-    int y = result[0] + result[1]*i + result[2]*i*i + result[3]*i*i*i;
+    int y = result.value(i);
     if(y >= 0 && y < polyMat.rows)
       polyMat.at<Vec3b>(Point(i, y)) = Vec3b(0, 0, 255);
   }
-
   namedWindow("PolyFit", WINDOW_NORMAL);
   imshow("PolyFit", polyMat);
   waitKey(0);

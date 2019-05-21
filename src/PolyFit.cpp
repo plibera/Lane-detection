@@ -12,9 +12,7 @@ PolyFit::PolyFit(vector<Point> in)
 }
 
 PolyFit::~PolyFit()
-{
-  //cout<<"PolyFit destructor"<<endl;
-}
+{}
 
 void PolyFit::setInput(vector<Point> in)
 {
