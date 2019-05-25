@@ -15,6 +15,7 @@ private:
     cv::Mat src;
     cv::Mat transformed;
     cv::Mat result;//transformed and binarized
+    cv::Mat unwarped;
     bool inputSet;
 
     FourPoints roi;//corners of the road roi
@@ -29,6 +30,7 @@ public:
     void setInput(cv::Mat input);
     cv::Mat getTransformed();
     cv::Mat getResult();
+    cv::Mat getUnwarped();
 
     //Only set roi if you have accurate coordinates and/or there aren't any straight
     //lines to perform calibration on

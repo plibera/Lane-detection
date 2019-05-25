@@ -1,7 +1,10 @@
-dewarp, pas na zielono, a potem REFACTORING
+Zmiana obslugi okien wychodzacych poza obreb klatki, jesli wielomian poprzednikow
+na to wskazuje trzeba ignorowac te okna
+
+REFACTORING
 
 Zmien warunki min max na wyjatki
-Polynomial ze wskaznikiem i konstruktorami odpowiednimi
+Wszedzie gdzie jest chodzenie po wektorze zmiana na iterator
 
 
 Klasy glowne:

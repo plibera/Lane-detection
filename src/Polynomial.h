@@ -60,12 +60,12 @@ Polynomial<Type>::Polynomial(const Polynomial<Type>& ck)//copying constructor
 template <class Type>
 Polynomial<Type>& Polynomial<Type>::operator=(const Polynomial<Type>& ck)//copying =
 {
-  Polynomial <Type> p(ck.degree);
+  deg = ck.deg;
   for(int i = 0; i <= deg; ++i)
   {
-    p.coeffs[i] = ck.coeffs[i];
+    coeffs[i] = ck.coeffs[i];
   }
-  return p;
+  return *this;
 }
 
 #endif

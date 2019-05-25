@@ -178,6 +178,8 @@ void LaneDetect::updateLines()
   Point currentCentre;
   int lookupVal;
   int middleIndex;
+
+  lineFits.clear();
   for(int i = 0; i < roadLines.size(); ++i)
   {
     roadLines[i].createHistograms();
@@ -213,6 +215,7 @@ void LaneDetect::updateLines()
         }
       }
       currentCentre = roadLines[i].getWindowCentre(windowNum);
+      int old = currentCentre.x;
       currentCentre.x = currentCentre.x - WINDOW_WIDTH/2 + middleIndex;
 
       if(roadLines.size() > 1)
@@ -221,16 +224,17 @@ void LaneDetect::updateLines()
         if(i==0)
         {
           border = roadLines[1].getWindowCentre(windowNum);
-          currentCentre.x = min(currentCentre.x, border.x-WINDOW_WIDTH);
+          currentCentre.x = min(currentCentre.x, border.x);
         }
         if(i==1)
         {
           border = roadLines[0].getWindowCentre(windowNum);
-          currentCentre.x = max(currentCentre.x, border.x+WINDOW_WIDTH);
+          currentCentre.x = max(currentCentre.x, border.x);
         }
         currentCentre.x = min(input.cols-1-WINDOW_WIDTH/2, max(WINDOW_WIDTH/2, currentCentre.x));
       }
-
+      //if(currentCentre.x < old - WINDOW_WIDTH/4) currentCentre.x = old-WINDOW_WIDTH/4;
+      //if(currentCentre.x > old + WINDOW_WIDTH/4) currentCentre.x = old+WINDOW_WIDTH/4;
       roadLines[i].setWindowCentre(windowNum, currentCentre);
     }
 
@@ -251,6 +255,8 @@ void LaneDetect::updateLines()
       a.x = laneSolution.value(a.y);
       roadLines[i].setWindowCentre(j, a);
     }
+
+    lineFits.push_back(laneSolution);
 
     for(int y = 0; y < input.rows; ++y)
     {

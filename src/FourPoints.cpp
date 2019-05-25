@@ -62,6 +62,7 @@ FourPoints& FourPoints::operator=(const FourPoints& ck)//copying =
   {
     this->push_back(ck.points[i]->point[0], ck.points[i]->point[1], ck.points[2]->point[2], ck.points[3]->point[3]);
   }
+  return *this;
 }
 
 //FourPoints(FourPoints&& rk);//moving constructor
@@ -133,6 +134,8 @@ vector<Point> FourPoints::getPoints(int index)
 {
     index = max(0, min((int)points.size()-1, index));
     vector<Point> a;
+    if(points.size() == 0)
+      return a;
     for(int i = 0; i < 4; ++i)
         a.push_back(points[index]->point[i]);
 
@@ -198,6 +201,10 @@ Point FourPoints::polygonCentre(int index)
 {
     index = max(0, min((int)points.size()-1, index));
     Point result(0,0);
+    if(points.size() == 0)
+      return result;
+
+
     for(int j = 0; j < 4; ++j)
     {
         result.x += points[index]->point[j].x;
@@ -209,7 +216,7 @@ Point FourPoints::polygonCentre(int index)
     return result;
 }
 
-Point FourPoints::linesIntersection(int index, int choosePair)
+/*Point FourPoints::linesIntersection(int index, int choosePair)
 {
     index = max(0, min((int)points.size()-1, index));
     if(choosePair != 1 && choosePair != 2)
@@ -245,4 +252,4 @@ Point FourPoints::linesIntersection(int index, int choosePair)
     Point result(chosen[3].x + k*a, chosen[3].y + k*b);
 
     return result;
-}
+}*/

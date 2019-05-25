@@ -53,7 +53,7 @@ public:
 
     //choosePair sets with which point point number 0 is going to create a line with
     //default pairs are 0 with 3 and 1 with 2
-    cv::Point linesIntersection(int index, int choosePair = 3);
+    //cv::Point linesIntersection(int index, int choosePair = 3);
 };
 
 

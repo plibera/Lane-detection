@@ -30,6 +30,9 @@ Point Window::polygonCentre(int index)
 {
   index = max(0, min((int)points.size()-1, index));
   Point result(0,0);
+  if(points.size() == 0)
+    return result;
+
   result.x = (points[index]->point[0].x + points[index]->point[2].x) / 2;
   result.y = (points[index]->point[0].y + points[index]->point[2].y) / 2;
 
@@ -77,7 +80,10 @@ void Window::createHistogram(int index)
 vector<int> Window::getHistogram(int index)
 {
   index = max(0, min((int)histograms.size()-1, index));
-  vector<int> v = histograms[index];
+  vector<int> v;
+  if(histograms.size() == 0)
+    return v;
+  v = histograms[index];
   return v;
 }
 
@@ -90,7 +96,11 @@ vector<vector<int> > Window::getHistograms()
 Mat Window::histToImg(int index)
 {
   index = max(0, min((int)histograms.size()-1, index));
-
+  if(histograms.size() == 0 || histograms[index].size() == 0)
+  {
+    Mat a;
+    return a;
+  }
   int maxVal = *max_element(histograms[index].begin(), histograms[index].end());
   maxVal = max(1, maxVal);
   int limit = hist.rows;
@@ -154,11 +164,14 @@ vector<Point> Window::getWindowCentres()
   {
     v.push_back(this->polygonCentre(i));
   }
+  return v;
 }
 
 Point Window::getWindowCentre(int index)
 {
   index = max(0, min((int)histograms.size()-1, index));
+  if(histograms.size() == 0) return Point(0,0);
+
   return this->polygonCentre(index);
 }
 

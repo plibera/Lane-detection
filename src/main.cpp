@@ -24,7 +24,7 @@ void performTests();
 
 int main(int argc, char** argv )
 {
-    performTests();
+    //performTests();
 
     if(argc < 3)
     {
@@ -91,6 +91,10 @@ int main(int argc, char** argv )
     //initialWindow.push_back(Point(0,0), Point(frame.cols-1, 0), Point(frame.cols-1, frame.rows-1), Point(0, frame.rows-1));
 
     int frame_id = 0;
+    vector<Polynomial<double> > polyLines;
+    Mat result, output, fin;
+    result = Mat::zeros(frame.rows, frame.rows, CV_8UC3);
+    output = Mat::zeros(frame.rows, frame.rows, CV_8UC3);
     while(!frame.empty())
     {
         imshow("Frame", frame);//causes leaks
@@ -99,6 +103,55 @@ int main(int argc, char** argv )
 
         lanes.setInput(birdView);
         lanes.updateLines();
+
+        polyLines = lanes.getLineFits();
+
+        /*for(int i = 0; i < polyLines.size(); ++i)
+        {
+          cout<<polyLines[i][2]<<" "<<polyLines[i][1]<<" "<<polyLines[i][0]<<endl;
+        }*/
+
+        if(polyLines[0][0] == 0 && polyLines[0][1] == 0 && polyLines[0][2] == 0)
+          lanes.initLines();
+
+        result = Mat::zeros(frame.rows, frame.cols, CV_8UC3);
+        int x;
+        for(int y = 0; y < result.rows; ++y)
+        {
+          for(int i = 0; i < polyLines.size(); ++i)
+          {
+            x = polyLines[i].value(y);
+            if(x >= 0 && x < result.cols)
+              result.at<Vec3b>(Point(x, y)) = Vec3b(255, 255, 255);
+          }
+        }
+        if(polyLines.size() == 2)
+        {
+          for(int y = 0; y < result.rows; ++y)
+          {
+            for(int x = max(0, min(result.cols, (int)polyLines[0].value(y))); x < max(0, min(result.cols, (int)polyLines[1].value(y))); ++x)
+                result.at<Vec3b>(Point(x, y)) = Vec3b(100, 100, 100);
+          }
+        }
+        bird.setInput(result);
+        result = bird.getUnwarped();
+        cvtColor(result, output, CV_GRAY2BGR);
+        for(int x = 0; x < output.cols; ++x)
+        {
+          for(int y = 0; y < output.rows; ++y)
+          {
+            if(output.at<Vec3b>(Point(x, y)) == Vec3b(255, 255, 255))
+              output.at<Vec3b>(Point(x, y)) = Vec3b(0, 0, 255);
+            if(output.at<Vec3b>(Point(x, y)) == Vec3b(100, 100, 100))
+              output.at<Vec3b>(Point(x, y)) = Vec3b(0, 255, 0);
+          }
+        }
+        Mat temp;
+        //cvtColor(frame, temp, CV_GRAY2BGR);
+        //cout<<output.size()<<" "<<result.size()<<endl;
+        //cout<<output.channels()<<" "<<result.channels()<<endl;
+        addWeighted(output, 0.5, frame, 1, 0, fin);
+        imshow("Final product", fin);
 
         /*initialWindow.setInput(birdView);
         initialWindow.createHistograms();
@@ -121,14 +174,17 @@ int main(int argc, char** argv )
 void performTests()
 {
   testBirdsEyeView();
-  cout<<"BirdsEyeView"<<endl;
+  cout<<"BirdsEyeView OK"<<endl;
   testFourPoints();
-  //testWindow();
+  cout<<"FourPoints OK"<<endl;
+  testWindow();
+  cout<<"Window OK"<<endl;
   testPolynomial();
-  cout<<"Polynomial"<<endl;
+  cout<<"Polynomial OK"<<endl;
   testPolyFit();
-  cout<<"Polyfit"<<endl;
-  //testLaneDetect();
+  cout<<"Polyfit OK"<<endl;
+  testLaneDetect();
+  cout<<"LaneDetect OK"<<endl;
 }
 
 void testBirdsEyeView()
@@ -151,8 +207,66 @@ void testBirdsEyeView()
 
 void testFourPoints()
 {
+  vector<Point> pvec;
+  FourPoints a;
+  FourPoints b(Point(10, 10));
+  FourPoints c(pvec, Point(10, 10));
+  pvec.push_back(Point(0,0));
+  pvec.push_back(Point(20,0));
+  pvec.push_back(Point(0,20));
+  pvec.push_back(Point(20,20));
+  FourPoints d(pvec, Point(10, 10));
+  FourPoints e(Point(0, 0), Point(10, 0), Point(10, 10), Point(0, 10), Point(10, 10));
+  c.push_back(pvec);
+  pvec = a.getPoints(0);
+  pvec = b.getPoints(13);
+  pvec = d.getPoints(0);
+  vector<Point> pvec2 = c.getPoints(0);
+  assert(pvec == pvec2);
+  e.setBoundaries(Point(5, 5));
+  a.setBoundaries(-1, -1);
+  assert(!a.withinBoundaries(Point(20, 20)));
+  c.clear();
+  c.size();
+  d.size();
+  a.size();
+  d.polygonCentre(0);
+  a.polygonCentre(0);
+  e.polygonCentre(30);
 
+  FourPoints s = a;
 }
+
+void testWindow()
+{
+  Mat mata = Mat::zeros(100, 100, CV_8UC1);
+  Window a(mata);
+  Mat matb;
+  Window b(matb);
+  vector<Point> pvec;
+  pvec.push_back(Point(0,0));
+  pvec.push_back(Point(20,0));
+  pvec.push_back(Point(0,200));
+  pvec.push_back(Point(20,200));
+  Window c(mata, pvec);
+  Window d(mata, Point(0,0), Point(10, 0), Point(10, 10), Point(0, 10));
+  Point point = d.polygonCentre(0);
+
+  a.createHistograms();
+  b.createHistograms();
+  c.createHistograms();
+  d.getHistograms();
+  d.getHistogram(10);
+  a.getHistogram(0);
+  vector<int> hists = c.getHistogram(0);
+  matb = c.histToImg();
+  a.setWindowCentre(0, Point(0,0));
+  c.setWindowCentre(0, Point(5, 5));
+  c.getWindowCentres();
+  a.setInput(matb);
+  Window e = d;
+}
+
 
 void testPolynomial()
 {
@@ -214,4 +328,21 @@ void testPolyFit()
   namedWindow("PolyFit", WINDOW_NORMAL);
   imshow("PolyFit", polyMat);
   waitKey(0);
+}
+
+void testLaneDetect()
+{
+  Mat mata = Mat::zeros(100, 100, CV_8UC1);
+  LaneDetect a;
+  LaneDetect b(mata);
+
+  a.initLines();
+  a.updateLines();
+  LaneDetect c = a;
+  c.updateLines();
+  LaneDetect d = a;
+  d.getLineFits();
+  b.updateLines();
+  b.initLines();
+  b.updateLines();
 }
