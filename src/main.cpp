@@ -122,36 +122,38 @@ int main(int argc, char** argv )
           {
             x = polyLines[i].value(y);
             if(x >= 0 && x < result.cols)
-              result.at<Vec3b>(Point(x, y)) = Vec3b(255, 255, 255);
+              result.at<Vec3b>(Point(x, y)) = Vec3b(100, 100, 100);
           }
         }
-        if(polyLines.size() == 2)
+        /*if(polyLines.size() == 2)
         {
           for(int y = 0; y < result.rows; ++y)
           {
             for(int x = max(0, min(result.cols, (int)polyLines[0].value(y))); x < max(0, min(result.cols, (int)polyLines[1].value(y))); ++x)
                 result.at<Vec3b>(Point(x, y)) = Vec3b(100, 100, 100);
           }
-        }
+        }*/
         bird.setInput(result);
         result = bird.getUnwarped();
         cvtColor(result, output, CV_GRAY2BGR);
+        fin = frame;
         for(int x = 0; x < output.cols; ++x)
         {
           for(int y = 0; y < output.rows; ++y)
           {
-            if(output.at<Vec3b>(Point(x, y)) == Vec3b(255, 255, 255))
-              output.at<Vec3b>(Point(x, y)) = Vec3b(0, 0, 255);
-            if(output.at<Vec3b>(Point(x, y)) == Vec3b(100, 100, 100))
-              output.at<Vec3b>(Point(x, y)) = Vec3b(0, 255, 0);
+            if(y > frame.rows - WINDOWS*WINDOW_HEIGHT)
+            {
+              Vec3b pixelVal = output.at<Vec3b>(Point(x, y));
+              //if(pixelVal.val[0] != 0) cout<<(int)pixelVal.val[0]<<" "<<(int)pixelVal.val[1]<<" "<<(int)pixelVal.val[2]<<endl;
+              if(pixelVal.val[0] > 0)
+                frame.at<Vec3b>(Point(x, y)) = Vec3b(0, 0, 255);
+              //if(output.at<Vec3b>(Point(x, y)) == Vec3b(100, 100, 100))
+                //output.at<Vec3b>(Point(x, y)) = Vec3b(0, 255, 0);
+            }
           }
         }
-        Mat temp;
-        //cvtColor(frame, temp, CV_GRAY2BGR);
-        //cout<<output.size()<<" "<<result.size()<<endl;
-        //cout<<output.channels()<<" "<<result.channels()<<endl;
-        addWeighted(output, 0.5, frame, 1, 0, fin);
-        imshow("Final product", fin);
+        //addWeighted(output, 1, frame, 1, 0, fin);
+        imshow("Final", fin);
 
         /*initialWindow.setInput(birdView);
         initialWindow.createHistograms();

@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include "FourPoints.h"
 
-#define THRESHOLD 120
+#define THRESHOLD 100
 
 class BirdsEyeView
 {
