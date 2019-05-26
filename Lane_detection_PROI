@@ -1,16 +1,7 @@
-Zmiana obslugi okien wychodzacych poza obreb klatki, jesli wielomian poprzednikow
-na to wskazuje trzeba ignorowac te okna
-
-REFACTORING
-
-Zmien warunki min max na wyjatki
-Wszedzie gdzie jest chodzenie po wektorze zmiana na iterator
-
-
 Klasy glowne:
-- BirdsEyeView - odpowiada za transformacje pojedynczej klatki na widok z lotu ptaka,
+- BirdsEyeView - odpowiada za transformacje pojedynczej klatki na widok z lotu ptaka, //i odwrotnie
   metody:
-  - kalibracja (rozne metody)
+  - kalibracja (rozne metody)//ostatecznie rezygnacja z automatycznej kalibracji
   - transformacja
 
 
@@ -18,9 +9,9 @@ Klasy glowne:
   metody:
   - aktualne przyblizenie pasa - zwraca dwa wielomiany
   - inicjalizacja - histogram dolnej polowy obrazu
-  - kontrola utraty pasa - jesli tak to uruchomienie ponowne inicjalizacji (prywatna?)
+  - kontrola utraty pasa - jesli tak to uruchomienie ponowne inicjalizacji (prywatna?) //ostatecznie prosta kontrola poza klasa
   - metoda przeprowadzajaca update okienek
-  - zmienna struktura - wskazniki na obiekty Window, czyli aktualne okienka na krawedziach pasa
+  - zmienna struktura - wskazniki na obiekty Window, czyli aktualne okienka na krawedziach pasa //ostatecznie wektor, zmienna struktura w innych klasach
 
 - PolyFit - przyblizenie vectora punktow z wejscia wielomianem okreslonego stopnia
 
@@ -37,9 +28,12 @@ Klasy pomocnicze:
 
 
 Funkcje wirtualne - na przyklad w przypadku klas FourPoints Window nadpisywanie np geometrycznej metody - w Okienku moze zwracac specyficzne informacje
+       //Funkcja wirtualna polygonCentre
 
-Obsluga wyjatkow - np bledy wczytywanego obrazu (czarna klatka)
+Obsluga wyjatkow - np bledy wczytywanego obrazu (czarna klatka) //nie ma takiego wyjatku, sa wyjatki w poszczegolnych klasach dotyczace
+  zazadania dostepu do niezaalokowanej pamieci - np. Window
 
-Wspolpraca ze strumieniami - np w klasie FourPoints, w mozliwej klasie obslugujacej wejscie/wyjscie
+Wspolpraca ze strumieniami - np w klasie FourPoints
 
-Kontenery - vector w klasie wielomian, wtedy iteratory przy przechodzeniu po wektorze
+Kontenery - vector w klasie wielomian, wtedy iteratory przy przechodzeniu po wektorze //wektory sa w wielu klasach, wykorzystywane sa w nich iteratory
+    np. Window

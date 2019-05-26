@@ -24,7 +24,7 @@ void performTests();
 
 int main(int argc, char** argv )
 {
-    //performTests();
+    performTests();
 
     if(argc < 3)
     {
@@ -64,10 +64,8 @@ int main(int argc, char** argv )
 
     Mat frame, birdView, histogram;
 
-    namedWindow("Frame", WINDOW_NORMAL);//causes leaks
-    resizeWindow("Frame", 1080, 720);//no point using without a window
-
-    //namedWindow("Histogram", WINDOW_NORMAL);
+    namedWindow("Frame", WINDOW_NORMAL);
+    resizeWindow("Frame", 1080, 720);
 
     BirdsEyeView bird;
     vid >> frame;
@@ -77,7 +75,7 @@ int main(int argc, char** argv )
 
     cout<<"Frame resolution: "<<frame.cols<<" "<<frame.rows<<endl;
 
-    imshow("Frame", frame);//causes leaks
+    imshow("Frame", frame);
     bird.setInput(frame);
     birdView = bird.getResult();
 
@@ -85,10 +83,6 @@ int main(int argc, char** argv )
 
     lanes.setInput(birdView);
     lanes.initLines();
-
-
-    //Window initialWindow(birdView);
-    //initialWindow.push_back(Point(0,0), Point(frame.cols-1, 0), Point(frame.cols-1, frame.rows-1), Point(0, frame.rows-1));
 
     int frame_id = 0;
     vector<Polynomial<double> > polyLines;
@@ -106,11 +100,6 @@ int main(int argc, char** argv )
 
         polyLines = lanes.getLineFits();
 
-        /*for(int i = 0; i < polyLines.size(); ++i)
-        {
-          cout<<polyLines[i][2]<<" "<<polyLines[i][1]<<" "<<polyLines[i][0]<<endl;
-        }*/
-
         if(polyLines[0][0] == 0 && polyLines[0][1] == 0 && polyLines[0][2] == 0)
           lanes.initLines();
 
@@ -125,14 +114,7 @@ int main(int argc, char** argv )
               result.at<Vec3b>(Point(x, y)) = Vec3b(100, 100, 100);
           }
         }
-        /*if(polyLines.size() == 2)
-        {
-          for(int y = 0; y < result.rows; ++y)
-          {
-            for(int x = max(0, min(result.cols, (int)polyLines[0].value(y))); x < max(0, min(result.cols, (int)polyLines[1].value(y))); ++x)
-                result.at<Vec3b>(Point(x, y)) = Vec3b(100, 100, 100);
-          }
-        }*/
+
         bird.setInput(result);
         result = bird.getUnwarped();
         cvtColor(result, output, CV_GRAY2BGR);
@@ -144,29 +126,19 @@ int main(int argc, char** argv )
             if(y > frame.rows - WINDOWS*WINDOW_HEIGHT)
             {
               Vec3b pixelVal = output.at<Vec3b>(Point(x, y));
-              //if(pixelVal.val[0] != 0) cout<<(int)pixelVal.val[0]<<" "<<(int)pixelVal.val[1]<<" "<<(int)pixelVal.val[2]<<endl;
               if(pixelVal.val[0] > 0)
                 frame.at<Vec3b>(Point(x, y)) = Vec3b(0, 0, 255);
-              //if(output.at<Vec3b>(Point(x, y)) == Vec3b(100, 100, 100))
-                //output.at<Vec3b>(Point(x, y)) = Vec3b(0, 255, 0);
             }
           }
         }
-        //addWeighted(output, 1, frame, 1, 0, fin);
         imshow("Final", fin);
 
-        /*initialWindow.setInput(birdView);
-        initialWindow.createHistograms();
-        histogram = initialWindow.histToImg();
-        imshow("Histogram", histogram);*/
-
-        char c = (char)waitKey(30);//causes leaks
+        char c = (char)waitKey(30);
         if(c == 27)//break when user presses ESC
             break;
 
         vid >> frame;
         cout<<"Frame id: "<<frame_id++<<endl;
-        //if(frame_id == 100) break;
     }
     return 0;
 }
@@ -237,6 +209,7 @@ void testFourPoints()
   e.polygonCentre(30);
 
   FourPoints s = a;
+  cout<<d<<endl<<e<<endl;
 }
 
 void testWindow()
@@ -258,11 +231,8 @@ void testWindow()
   b.createHistograms();
   c.createHistograms();
   d.getHistograms();
-  d.getHistogram(10);
-  a.getHistogram(0);
   vector<int> hists = c.getHistogram(0);
   matb = c.histToImg();
-  a.setWindowCentre(0, Point(0,0));
   c.setWindowCentre(0, Point(5, 5));
   c.getWindowCentres();
   a.setInput(matb);

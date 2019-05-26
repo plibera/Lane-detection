@@ -22,13 +22,13 @@ Window::Window(Mat image, Point a, Point b, Point c, Point d) : FourPoints(a, b,
 }
 
 Window::~Window()
-{
-  //cout<<"Window destructor"<<endl;
-}
+{}
 
 Point Window::polygonCentre(int index)
 {
-  index = max(0, min((int)points.size()-1, index));
+  if(index < 0 || index >= points.size())
+    throw "Requested index outside of allocated memory";
+
   Point result(0,0);
   if(points.size() == 0)
     return result;
@@ -57,9 +57,6 @@ void Window::createHistogram(int index)
   if(index < 0 || index >= points.size())
     return;
 
-  //cout<<points[index]->point[0].x<<" "<<points[index]->point[0].y<<endl;
-  //cout<<points[index]->point[2].x<<" "<<points[index]->point[2].y<<endl<<endl;
-
   int count = 0;
   for(int x = points[index]->point[0].x; x < points[index]->point[2].x; ++x)
   {
@@ -69,8 +66,6 @@ void Window::createHistogram(int index)
       if(src.at<uchar>(Point(x, y)) == 255)
       {
         count++;
-        //if(y > 420)
-          //count += 7;
       }
     }
     histograms[index].push_back(count);
@@ -79,7 +74,8 @@ void Window::createHistogram(int index)
 
 vector<int> Window::getHistogram(int index)
 {
-  index = max(0, min((int)histograms.size()-1, index));
+  if(index < 0 || index >= histograms.size())
+    throw "Requested index outside of allocated memory";
   vector<int> v;
   if(histograms.size() == 0)
     return v;
@@ -95,7 +91,9 @@ vector<vector<int> > Window::getHistograms()
 
 Mat Window::histToImg(int index)
 {
-  index = max(0, min((int)histograms.size()-1, index));
+  if(index < 0 || index >= histograms.size())
+    throw "Requested index outside of allocated memory";
+
   if(histograms.size() == 0 || histograms[index].size() == 0)
   {
     Mat a;
@@ -106,10 +104,12 @@ Mat Window::histToImg(int index)
   int limit = hist.rows;
 
   vector<int> valuesToShow;
-  for(unsigned int i = 0; i < histograms[index].size(); ++i)
+  vector<int>::iterator valuesIt = valuesToShow.end();
+  for(vector<int>::iterator it = histograms[index].begin(); it != histograms[index].end(); ++it)
   {
-    valuesToShow.push_back(histograms[index][i]*limit / maxVal);
-    valuesToShow[i] = limit - valuesToShow[i];
+    valuesToShow.push_back(*it * limit / maxVal);
+    *valuesIt = limit - *valuesIt;
+    valuesIt++;
   }
   hist = Mat::zeros(limit, histograms[index].size(), src.type());
   for(unsigned int x = 0; x < hist.cols; ++x)
@@ -169,7 +169,8 @@ vector<Point> Window::getWindowCentres()
 
 Point Window::getWindowCentre(int index)
 {
-  index = max(0, min((int)histograms.size()-1, index));
+  if(index < 0 || index >= histograms.size())
+    throw "Requested index outside of allocated memory";
   if(histograms.size() == 0) return Point(0,0);
 
   return this->polygonCentre(index);

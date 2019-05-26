@@ -36,7 +36,7 @@ public:
     //lines to perform calibration on
     void setRoi(std::vector<cv::Point> roiCorners);
 
-    void calibrate();
+    //void calibrate();
 };
 
 

@@ -3,6 +3,7 @@
 
 #include <opencv2/opencv.hpp>
 #include <stdio.h>
+#include <iostream>
 
 //Class containing many sets of four points
 //Every coordinate must be between 0 and boundary
@@ -29,10 +30,10 @@ public:
 
     FourPoints(const FourPoints& ck);//copying constructor
     FourPoints& operator=(const FourPoints& ck);//copying =
-    //FourPoints(FourPoints&& rk);//moving constructor
-    //FourPoints& operator=(FourPoints&& rk);//moving =
 
     ~FourPoints();
+
+    friend std::ostream &operator<< (std::ostream &output, const FourPoints &p);
 
     void push_back(std::vector<cv::Point> input);
     void push_back(cv::Point a, cv::Point b, cv::Point c, cv::Point d);

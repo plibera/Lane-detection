@@ -2,6 +2,8 @@
 #define POLYNOMIAL_H
 
 #include <stdio.h>
+#include <iostream>
+#include <stdlib.h>
 #include <vector>
 #include <math.h>
 
@@ -29,7 +31,7 @@ template <class Type>
 Type & Polynomial<Type>::operator[](int i)
 {
   if(i < 0 || i > deg)
-    throw "Requested index out of memory";
+    throw "Requested index outside of allocated memory";
 
   return coeffs[i];
 }
@@ -47,7 +49,7 @@ Type Polynomial<Type>::value(int x)
 }
 
 template <class Type>
-Polynomial<Type>::Polynomial(const Polynomial<Type>& ck)//copying constructor
+Polynomial<Type>::Polynomial(const Polynomial<Type>& ck)
 {
   this->deg = ck.deg;
   this->coeffs = new Type[deg+1];
@@ -58,7 +60,7 @@ Polynomial<Type>::Polynomial(const Polynomial<Type>& ck)//copying constructor
 }
 
 template <class Type>
-Polynomial<Type>& Polynomial<Type>::operator=(const Polynomial<Type>& ck)//copying =
+Polynomial<Type>& Polynomial<Type>::operator=(const Polynomial<Type>& ck)
 {
   deg = ck.deg;
   for(int i = 0; i <= deg; ++i)

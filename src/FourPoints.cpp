@@ -44,7 +44,7 @@ FourPoints::FourPoints(Point a, Point b, Point c, Point d, Point bounds)
 }
 
 
-FourPoints::FourPoints(const FourPoints& ck)//copying constructor
+FourPoints::FourPoints(const FourPoints& ck)
 {
   this->boundary = ck.boundary;
   this->clear();
@@ -54,7 +54,7 @@ FourPoints::FourPoints(const FourPoints& ck)//copying constructor
   }
 }
 
-FourPoints& FourPoints::operator=(const FourPoints& ck)//copying =
+FourPoints& FourPoints::operator=(const FourPoints& ck)
 {
   this->boundary = ck.boundary;
   this->clear();
@@ -65,17 +65,27 @@ FourPoints& FourPoints::operator=(const FourPoints& ck)//copying =
   return *this;
 }
 
-//FourPoints(FourPoints&& rk);//moving constructor
-//FourPoints& operator=(FourPoints&& rk);//moving =
 
 FourPoints::~FourPoints()
 {
-  //cout<<"FourPoints destructor"<<endl;
     while(points.size() > 0)
     {
         delete points[points.size()-1];
         points.pop_back();
     }
+}
+
+std::ostream & operator<< (std::ostream &output, const FourPoints &p)
+{
+  for(int i = 0; i < p.points.size(); ++i)
+  {
+    for(int j = 0; j < 4; ++j)
+    {
+      output<<"("<<p.points[i]->point[j].x<<", "<<p.points[i]->point[j].y<<") ";
+    }
+    output<<endl;
+  }
+  return output;
 }
 
 void FourPoints::push_back(Point a, Point b, Point c, Point d)

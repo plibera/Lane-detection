@@ -15,16 +15,14 @@ BirdsEyeView::BirdsEyeView(Mat input)
     setInput(input);
 }
 
-BirdsEyeView::~BirdsEyeView()
-{
+BirdsEyeView::~BirdsEyeView(){}
 
-}
 
 void BirdsEyeView::setInput(Mat input)
 {
     if(input.channels() > 1)
     {
-         cvtColor(input, input, COLOR_BGR2GRAY);//causes leaks
+         cvtColor(input, input, COLOR_BGR2GRAY);
     }
     src = input;
     inputSet = 1;
@@ -75,21 +73,21 @@ void BirdsEyeView::performTransform()
     dstver[3] = Point(2*src.cols/5, src.rows);
 
     Mat M = getPerspectiveTransform(srcver, dstver);
-    warpPerspective(src, transformed, M, transformed.size(), INTER_LINEAR, BORDER_CONSTANT);//causes leaks
-  //  namedWindow("transformed", WINDOW_NORMAL);//causes leaks
-    //imshow("transformed", transformed);//causes leaks
+    warpPerspective(src, transformed, M, transformed.size(), INTER_LINEAR, BORDER_CONSTANT);
+  //  namedWindow("transformed", WINDOW_NORMAL);
+    //imshow("transformed", transformed);
 
-    threshold( transformed, result, THRESHOLD, 255, 0 );//causes possible leaks
-    //namedWindow("result", WINDOW_NORMAL);//causes leaks
-    //imshow("result", result);//causes leaks
+    threshold( transformed, result, THRESHOLD, 255, 0 );
+    //namedWindow("result", WINDOW_NORMAL);
+    //imshow("result", result);
 
     M = getPerspectiveTransform(dstver, srcver);
-    warpPerspective(src, unwarped, M, unwarped.size(), INTER_LINEAR, BORDER_CONSTANT);//causes leaks
-    //namedWindow("unwarped", WINDOW_NORMAL);//causes leaks
-    //imshow("unwarped", unwarped);//causes leaks
+    warpPerspective(src, unwarped, M, unwarped.size(), INTER_LINEAR, BORDER_CONSTANT);
+    //namedWindow("unwarped", WINDOW_NORMAL);
+    //imshow("unwarped", unwarped);
 }
 
-void BirdsEyeView::calibrate()
+/*void BirdsEyeView::calibrate()
 {
   //find lines, four points, use class FourPoints - find intersection
     Mat edges;
@@ -117,4 +115,4 @@ void BirdsEyeView::calibrate()
     }
     namedWindow("lines", WINDOW_NORMAL);
     imshow("lines", show);
-}
+}*/
