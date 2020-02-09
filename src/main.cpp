@@ -24,7 +24,7 @@ void performTests();
 
 int main(int argc, char** argv )
 {
-    performTests();
+    //performTests();
 
     if(argc < 3)
     {
