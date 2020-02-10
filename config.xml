@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<Calibration>
+    <Video filename="/media/piotr/DATA/Datasets/Phone_camera_080220/20200208_111340.mp4" rotation="180">
+        <Point x="1003" y="833" />
+        <Point x="1054" y="833" />
+        <Point x="1524" y="1080" />
+        <Point x="573" y="1080" />
+    </Video>
+    <Video filename="/media/piotr/DATA/Datasets/Phone_camera_080220/20200208_111729.mp4" rotation="180">
+        <Point x="1044" y="752" />
+        <Point x="1079" y="752" />
+        <Point x="1689" y="1080" />
+        <Point x="514" y="1080" />
+    </Video>
+    <Video filename="/home/piotr/Videos/road1.mp4" rotation="0">
+        <Point x="499" y="418" />
+        <Point x="512" y="418" />
+        <Point x="686" y="576" />
+        <Point x="242" y="576" />
+    </Video>
+    <Video filename="/home/piotr/Videos/road2.mp4" rotation="0">
+        <Point x="488" y="239" />
+        <Point x="536" y="239" />
+        <Point x="899" y="576" />
+        <Point x="39" y="576" />
+    </Video>
+    <Video filename="/home/piotr/Videos/road3.avi" rotation="0">
+        <Point x="259" y="172" />
+        <Point x="296" y="172" />
+        <Point x="464" y="480" />
+        <Point x="99" y="480" />
+    </Video>
+</Calibration>

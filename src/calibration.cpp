@@ -10,7 +10,7 @@
 using namespace std;
 using namespace cv;
 
-string configFilename = "config.xml";
+string configFilename = "../config.xml";
 
 Mat frame;
 Mat shadow;
@@ -50,22 +50,63 @@ int main(int argc, char **argv)
   }
 
   vid>>frame;
-
   frameWidth = frame.cols;
   frameHeight = frame.rows;
-  bottomLeftXSlider = frameWidth/3;
-  bottomRightXSlider = 2*frameWidth/3;
-  topYSlider = frameHeight/2;
-  topLeftXSlider = 2*frameWidth/5;
-  topRightXSlider = 3*frameWidth/5;
+
+  TiXmlDocument doc(configFilename);
+	bool loadOkay = doc.LoadFile();
+  bool vidFound = false;
+  TiXmlHandle hDoc(&doc);
+  TiXmlElement* vidElem;
+  TiXmlElement* pointElem;
+	if(loadOkay)
+	{
+	  vidElem = hDoc.FirstChild("Calibration").FirstChild("Video").ToElement();
+    while(vidElem)
+    {
+      if(vidName == vidElem->Attribute("filename"))
+      {
+        vidFound = true;
+        break;
+      }
+      vidElem = vidElem->NextSiblingElement();
+    }
+    if(vidFound)
+    {
+      rotation = atoi(vidElem->Attribute("rotation"));
+      if(rotation == 90)
+        rotate(frame, frame, ROTATE_90_CLOCKWISE);
+      else if(rotation == 180)
+        rotate(frame, frame, ROTATE_180);
+      else if(rotation == 270)
+        rotate(frame, frame, ROTATE_90_COUNTERCLOCKWISE);
+      pointElem = vidElem->FirstChildElement("Point");
+      topYSlider = frameHeight - atoi(pointElem->Attribute("y"));
+      topLeftXSlider = atoi(pointElem->Attribute("x"));
+      pointElem = pointElem->NextSiblingElement();
+      topRightXSlider = atoi(pointElem->Attribute("x"));
+      pointElem = pointElem->NextSiblingElement();
+      bottomRightXSlider = atoi(pointElem->Attribute("x"));
+      pointElem = pointElem->NextSiblingElement();
+      bottomLeftXSlider = atoi(pointElem->Attribute("x"));
+    }
+	}
+  if(!loadOkay || !vidFound)
+  {
+    bottomLeftXSlider = frameWidth/3;
+    bottomRightXSlider = 2*frameWidth/3;
+    topYSlider = frameHeight/2;
+    topLeftXSlider = 2*frameWidth/5;
+    topRightXSlider = 3*frameWidth/5;
+  }
 
   namedWindow("Calibration", WINDOW_NORMAL);
 
-  createTrackbar("Bottom left X", "Calibration", &bottomLeftXSlider, frameWidth, trackbarCallback);
-  createTrackbar("Bottom right X", "Calibration", &bottomRightXSlider, frameWidth, trackbarCallback);
   createTrackbar("Top Y", "Calibration", &topYSlider, frameWidth, trackbarCallback);
   createTrackbar("Top left X", "Calibration", &topLeftXSlider, frameWidth, trackbarCallback);
   createTrackbar("Top right X", "Calibration", &topRightXSlider, frameWidth, trackbarCallback);
+  createTrackbar("Bottom right X", "Calibration", &bottomRightXSlider, frameWidth, trackbarCallback);
+  createTrackbar("Bottom left X", "Calibration", &bottomLeftXSlider, frameWidth, trackbarCallback);
 
   trackbarCallback(bottomLeftXSlider, 0);
   char c = waitKey(0);
@@ -111,24 +152,8 @@ int main(int argc, char **argv)
     c = waitKey(0);
   }
 
-  TiXmlDocument doc(configFilename);
-	bool loadOkay = doc.LoadFile();
-	if(loadOkay)
-	{
-    TiXmlHandle hDoc(&doc);
-	  TiXmlElement* vidElem;
-    TiXmlElement* pointElem;
-	  vidElem = hDoc.FirstChild("Calibration").FirstChild("Video").ToElement();
-    bool vidFound = false;
-    while(vidElem)
-    {
-      if(vidName == vidElem->Attribute("filename"))
-      {
-        vidFound = true;
-        break;
-      }
-      vidElem = vidElem->NextSiblingElement();
-    }
+  if(loadOkay)
+  {
     if(vidFound)
     {
       pointElem = vidElem->FirstChildElement("Point");
@@ -150,6 +175,7 @@ int main(int argc, char **argv)
       vidElem = new TiXmlElement("Video");
       root->LinkEndChild(vidElem);
       vidElem->SetAttribute("filename", vidName);
+      vidElem->SetAttribute("rotation", rotation);
       pointElem = new TiXmlElement("Point");
       vidElem->LinkEndChild(pointElem);
       pointElem->SetAttribute("x", topLeftXSlider);
@@ -168,8 +194,8 @@ int main(int argc, char **argv)
       pointElem->SetAttribute("y", frameHeight);
     }
     doc.SaveFile(configFilename);
-	}
-	else
+  }
+  else
 	{
     cout<<"Creating new config file"<<endl;
     createNewConfig(vidName);
@@ -186,8 +212,11 @@ static void trackbarCallback(int, void*)
   pts[1] = Point(topRightXSlider, frameHeight - topYSlider);
   pts[2] = Point(bottomRightXSlider, frameHeight);
   pts[3] = Point(bottomLeftXSlider, frameHeight);
-  fillConvexPoly(shadow, pts, 4, Scalar(255, 255, 255));
+  fillConvexPoly(shadow, pts, 4, Scalar(255, 255, 0));
+  rectangle(shadow, Point(0, 0), Point(shadow.cols, 40), Scalar(255, 255, 255), -1);
   addWeighted(frame, 1, shadow, -0.5, 0.0, combined);
+  putText(combined, "Press 'r' to rotate, 'n' to use a different frame, any other key to save",
+          Point(10,30), FONT_HERSHEY_SIMPLEX, 1, Scalar(255, 255, 255), 2);
   imshow("Calibration", combined);
 }
 
@@ -206,6 +235,7 @@ void createNewConfig(string vidName)
   video = new TiXmlElement("Video");
   root->LinkEndChild(video);
   video->SetAttribute("filename", vidName);
+  video->SetAttribute("rotation", rotation);
 
   TiXmlElement *point;
   point = new TiXmlElement("Point");
