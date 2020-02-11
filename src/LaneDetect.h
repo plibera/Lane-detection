@@ -4,27 +4,26 @@
 #include <stdio.h>
 #include <vector>
 #include "Window.h"
-#include "Polynomial.h"
 #include "PolyFit.h"
 
 
 #define WINDOW_WIDTH 100
 #define WINDOW_HEIGHT 50
-#define WINDOWS 5
+#define WINDOWS 9
 
 class LaneDetect
 {
   cv::Mat input;
   bool inputSet;
-  std::vector<Window> roadLines;
-  std::vector<Polynomial<double> > lineFits;
+  std::vector<std::vector<Window> > roadLines;
+  std::vector<std::vector<double> > lineFits;
 
 public:
   LaneDetect();
   LaneDetect(cv::Mat in);
 
   void setInput(cv::Mat in);
-  std::vector<Polynomial<double> > getLineFits();
+  std::vector<std::vector<double> > getLineFits();
 
   void initLines();
   void updateLines();

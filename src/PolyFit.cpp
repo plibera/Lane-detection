@@ -19,10 +19,11 @@ void PolyFit::setInput(vector<Point> in)
   input = in;
 }
 
-Polynomial<double> PolyFit::solve()
+vector<double> PolyFit::solve()
 {
-  for(int i = 0; i <= output.degree(); ++i)
-    output[i] = 0;
+  output.clear();
+  for(int i = 0; i <= DEGREE; ++i)
+    output.push_back(0);
   if(input.size() == 0)
     return output;
 
@@ -37,7 +38,7 @@ Polynomial<double> PolyFit::solve()
     y[i] = input[i].y;
   }
 
-  n = output.degree();
+  n = DEGREE;
   double *X = new double[2*n+1];
   for(int i = 0; i < 2*n+1; i++)
   {
@@ -93,7 +94,7 @@ Polynomial<double> PolyFit::solve()
     a[i] = a[i] / B[i][i];
   }
 
-  for(int i = 0; i <= output.degree(); ++i)
+  for(int i = 0; i <= DEGREE; ++i)
   {
     output[i] = a[i];
   }
@@ -104,4 +105,17 @@ Polynomial<double> PolyFit::solve()
   delete[] x, y, X, B, a, Y;
 
   return output;
+}
+
+
+double value(int x, vector<double> coeffs)
+{
+  double result = 0;
+  double a = 1;
+  for(int i = 0; i < coeffs.size(); ++i)
+  {
+    result += coeffs[i]*a;
+    a *= (double)x;
+  }
+  return result;
 }

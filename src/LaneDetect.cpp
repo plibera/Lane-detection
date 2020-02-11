@@ -20,12 +20,15 @@ void LaneDetect::setInput(Mat in)
   input = in;
   for(int i = 0; i < roadLines.size(); ++i)
   {
-    roadLines[i].setInput(input);
+    for(int j = 0; j < roadLines[i].size(); ++j)
+    {
+      roadLines[i][j].setInput(input);
+    }
   }
   inputSet = 1;
 }
 
-vector<Polynomial<double> > LaneDetect::getLineFits()
+vector<vector<double> > LaneDetect::getLineFits()
 {
   return lineFits;
 }
@@ -37,14 +40,13 @@ void LaneDetect::initLines()
 
   roadLines.clear();
   lineFits.clear();
-  Window roi(input, Point(0, input.rows/2), Point(input.cols-1, input.rows/2), Point(input.cols-1, input.rows-1), Point(0, input.rows-1));
-  roi.createHistograms();
-  vector<int> histogram = roi.getHistogram(0);
-  vector<int> newCentres;
+  Window roi(input, Point(0, input.rows/2), Point(input.rows-1, input.cols-1));
+  vector<int> histogram = roi.getHistogram();
+  vector<int> newcenters;
 
-  int sumThreshold = 100;
-
-  for(int x = WINDOW_WIDTH/2; x < input.cols - WINDOW_WIDTH/2; ++x)
+  int sumThreshold = 1000;
+  //for(int x = WINDOW_WIDTH/2; x < input.cols - WINDOW_WIDTH/2; ++x)
+  for(int x = 2*WINDOW_WIDTH; x < input.cols - WINDOW_WIDTH/2; ++x)
   {
     int xp = x;
     for(int j = 0; j < WINDOW_WIDTH/2; ++j)
@@ -64,43 +66,40 @@ void LaneDetect::initLines()
     }
     if(sum >= sumThreshold)
     {
-      newCentres.push_back(x);
+      newcenters.push_back(x);
     }
     x += WINDOW_WIDTH-1;
   }
 
   vector<Point> lineStart;
-  for(int i = 0; i < newCentres.size(); ++i)
+  for(int i = 0; i < newcenters.size(); ++i)
   {
-    roi.clear();
-    roi.push_back(Point(newCentres[i]-WINDOW_WIDTH/2, input.rows-WINDOW_HEIGHT), Point(newCentres[i]+WINDOW_WIDTH/2, input.rows-WINDOW_HEIGHT),
-                  Point(newCentres[i]+WINDOW_WIDTH/2, input.rows), Point(newCentres[i]-WINDOW_WIDTH/2, input.rows));
-    roi.createHistograms();
-    histogram = roi.getHistogram(0);
+    Window w(input, Point(newcenters[i], input.rows-WINDOW_HEIGHT/2), WINDOW_WIDTH, WINDOW_HEIGHT);
+    histogram = w.getHistogram();
     for(int j = 0; j < histogram.size(); ++j)
     {
       if(histogram[j] > 0)
       {
-        lineStart.push_back(Point(newCentres[i], input.rows-WINDOW_HEIGHT/2));
+        lineStart.push_back(Point(newcenters[i], input.rows-WINDOW_HEIGHT/2));
         break;
       }
     }
   }
 
   vector<int> histPrefixSum;
-  Point currentCentre;
+  Point currentcenter;
   int lookupVal;
   int middleIndex;
+  vector<Window> currentLine;
   for(int i = 0; i < lineStart.size(); ++i)
   {
-    Window a(input);
-    currentCentre = lineStart[i];
+    currentLine.clear();
+    Window a(input, Point(0, 0), WINDOW_WIDTH, WINDOW_HEIGHT);
+    currentcenter = lineStart[i];
     for(int windowNum = 0; windowNum < WINDOWS; ++windowNum)
     {
-      a.push_back(Point(currentCentre.x-WINDOW_WIDTH/2, input.rows-(windowNum+1)*WINDOW_HEIGHT), Point(currentCentre.x+WINDOW_WIDTH/2, input.rows-(windowNum+1)*WINDOW_HEIGHT),
-                  Point(currentCentre.x+WINDOW_WIDTH/2, input.rows-windowNum*WINDOW_HEIGHT), Point(currentCentre.x-WINDOW_WIDTH/2, input.rows-windowNum*WINDOW_HEIGHT));
-      a.createHistograms();
-      histogram = a.getHistogram(windowNum);
+      a.setCenter(currentcenter);
+      histogram = a.getHistogram();
 
       histPrefixSum.clear();
       histPrefixSum.push_back(histogram[0]);
@@ -120,11 +119,12 @@ void LaneDetect::initLines()
       }
       if(histPrefixSum[histPrefixSum.size()-1] == 0)
         middleIndex = WINDOW_WIDTH/2;
-      currentCentre.x = currentCentre.x - WINDOW_WIDTH/2 + middleIndex;
-      a.setWindowCentre(windowNum, currentCentre);
-      currentCentre.y -= WINDOW_HEIGHT;
+      currentcenter.x = currentcenter.x - WINDOW_WIDTH/2 + middleIndex;
+      a.setCenter(currentcenter);
+      currentLine.push_back(a);
+      currentcenter.y -= WINDOW_HEIGHT;
     }
-    roadLines.push_back(a);
+    roadLines.push_back(currentLine);
   }
 
 
@@ -132,13 +132,13 @@ void LaneDetect::initLines()
   cvtColor(input, debug, COLOR_GRAY2BGR);
   for(int i = 0; i < roadLines.size(); ++i)
   {
-    //rectangle(debug, Point(newCentres[i]-WINDOW_WIDTH/2, 430), Point(newCentres[i]+WINDOW_WIDTH/2, 480), Scalar(255, 0, 0), 5);
+    //rectangle(debug, Point(newcenters[i]-WINDOW_WIDTH/2, 430), Point(newcenters[i]+WINDOW_WIDTH/2, 480), Scalar(255, 0, 0), 5);
     //rectangle(debug, Point(lineStart[i].x-WINDOW_WIDTH/2, lineStart[i].y-WINDOW_HEIGHT/2), Point(lineStart[i].x+WINDOW_WIDTH/2, lineStart[i].y+WINDOW_HEIGHT/2),
       //        Scalar(255, 0, 0), 5);
     for(int j = 0; j < roadLines[i].size(); ++j)
     {
       Point a, b, c;
-      c = roadLines[i].getWindowCentre(j);
+      c = roadLines[i][j].center();
       a.x = c.x - WINDOW_WIDTH/2;
       a.y = c.y - WINDOW_HEIGHT/2;
       b.x = c.x + WINDOW_WIDTH/2;
@@ -152,26 +152,26 @@ void LaneDetect::initLines()
 
 void LaneDetect::updateLines()
 {
+
   Mat debug;
   cvtColor(input, debug, COLOR_GRAY2BGR);
 
   int blackWindowIdx = WINDOWS;
   vector<int> histogram;
   vector<int>histPrefixSum;
-  Point currentCentre;
+  Point currentcenter;
   int lookupVal;
   int middleIndex;
 
   lineFits.clear();
   for(int i = 0; i < roadLines.size(); ++i)
   {
-    roadLines[i].createHistograms();
     blackWindowIdx = WINDOWS;
     histogram.clear();
     histPrefixSum.clear();
     for(int windowNum = 0; windowNum < roadLines[i].size(); ++windowNum)
     {
-      histogram = roadLines[i].getHistogram(windowNum);
+      histogram = roadLines[i][windowNum].getHistogram();
       histPrefixSum.clear();
       histPrefixSum.push_back(histogram[0]);
       for(int j = 1; j < histogram.size(); ++j)
@@ -195,60 +195,60 @@ void LaneDetect::updateLines()
           break;
         }
       }
-      currentCentre = roadLines[i].getWindowCentre(windowNum);
-      int old = currentCentre.x;
-      currentCentre.x = currentCentre.x - WINDOW_WIDTH/2 + middleIndex;
+      currentcenter = roadLines[i][windowNum].center();
+      int old = currentcenter.x;
+      currentcenter.x = currentcenter.x - WINDOW_WIDTH/2 + middleIndex;
 
-      if(roadLines.size() == 2)
+      /*if(roadLines.size() == 2)
       {
         Point border;
         if(i==0)
         {
-          border = roadLines[1].getWindowCentre(windowNum);
-          currentCentre.x = min(currentCentre.x, border.x-WINDOW_WIDTH/2);
+          border = roadLines[1][windowNum].center();
+          currentcenter.x = min(currentcenter.x, border.x-WINDOW_WIDTH/2);
         }
         if(i==1)
         {
-          border = roadLines[0].getWindowCentre(windowNum);
-          currentCentre.x = max(currentCentre.x, border.x+WINDOW_WIDTH/2);
+          border = roadLines[0][windowNum].center();
+          currentcenter.x = max(currentcenter.x, border.x+WINDOW_WIDTH/2);
         }
-        currentCentre.x = min(input.cols-1-WINDOW_WIDTH/2, max(WINDOW_WIDTH/2, currentCentre.x));
-      }
-      if(currentCentre.x < old - WINDOW_WIDTH/2) currentCentre.x = old-WINDOW_WIDTH/2;
-      if(currentCentre.x > old + WINDOW_WIDTH/2) currentCentre.x = old+WINDOW_WIDTH/2;
+        //currentcenter.x = min(input.cols-1-WINDOW_WIDTH/2, max(WINDOW_WIDTH/2, currentcenter.x));
+      }*/
+      if(currentcenter.x < old - WINDOW_WIDTH/8) currentcenter.x = old-WINDOW_WIDTH/8;
+      if(currentcenter.x > old + WINDOW_WIDTH/8) currentcenter.x = old+WINDOW_WIDTH/8;
 
-      roadLines[i].setWindowCentre(windowNum, currentCentre);
+      roadLines[i][windowNum].setCenter(currentcenter);
     }
 
     vector<Point> lanePoints;
     for(int j = 0; j < blackWindowIdx; ++j)
     {
-      Point a = roadLines[i].getWindowCentre(j);
+      Point a = roadLines[i][j].center();
       swap(a.x, a.y);
       lanePoints.push_back(a);
     }
 
     PolyFit polyfit(lanePoints);
-    Polynomial<double> laneSolution = polyfit.solve();
+    vector<double> laneSolution = polyfit.solve();
 
 
     for(int j = blackWindowIdx; j < roadLines[i].size(); ++j)
     {
-      Point a = roadLines[i].getWindowCentre(j);
-      a.x = laneSolution.value(a.y);
-      roadLines[i].setWindowCentre(j, a);
+      Point a = roadLines[i][j].center();
+      a.x = value(a.y, laneSolution);
+      roadLines[i][j].setCenter(a);
     }
     lineFits.push_back(laneSolution);
 
     for(int y = 0; y < input.rows; ++y)
     {
-      double x = laneSolution.value(y);
+      double x = value(y, laneSolution);
       if(x >= 0 && x < input.cols) debug.at<Vec3b>(Point(x, y)) = Vec3b(0, 0, 255);
     }
     for(int j = 0; j < roadLines[i].size(); ++j)
     {
       Point a, b, c;
-      c = roadLines[i].getWindowCentre(j);
+      c = roadLines[i][j].center();
       a.x = c.x - WINDOW_WIDTH/2;
       a.y = c.y - WINDOW_HEIGHT/2;
       b.x = c.x + WINDOW_WIDTH/2;

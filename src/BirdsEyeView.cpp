@@ -1,6 +1,5 @@
 #include "BirdsEyeView.h"
 
-
 using namespace cv;
 using namespace std;
 
@@ -26,7 +25,6 @@ void BirdsEyeView::setInput(Mat input)
     }
     src = input;
     inputSet = 1;
-    roi.setBoundaries(src.cols, src.rows);
     transformed = Mat::zeros(src.rows, src.cols, src.type());
     result = Mat::zeros(src.rows, src.cols, src.type());
     unwarped = Mat::zeros(src.rows, src.cols, src.type());
@@ -50,25 +48,23 @@ Mat BirdsEyeView::getUnwarped()
 
 void BirdsEyeView::setRoi(vector<Point> roiCorners)
 {
-    roi.setBoundaries(src.cols, src.rows);
-    roi.clear();
-    roi.push_back(roiCorners);
+    if(roiCorners.size() >= 4)
+      roi = roiCorners;
 }
 
 
 void BirdsEyeView::performTransform()
 {
-    if(roi.size() == 0)
+    if(roi.size() < 4)
         return;
     Point2f srcver[4];
-    vector<Point> roiPoints = roi.getPoints(0);
     for(int j = 0; j < 4; ++j)
     {
-        srcver[j] = roiPoints[j];
+        srcver[j] = roi[j];
     }
     Point2f dstver[4];
-    dstver[0] = Point(2*src.cols/5, 0);//src.rows/4);
-    dstver[1] = Point(3*src.cols/5, 0);//src.rows/4);
+    dstver[0] = Point(2*src.cols/5, src.rows/4);
+    dstver[1] = Point(3*src.cols/5, src.rows/4);
     dstver[2] = Point(3*src.cols/5, src.rows);
     dstver[3] = Point(2*src.cols/5, src.rows);
 
@@ -77,6 +73,7 @@ void BirdsEyeView::performTransform()
   //  namedWindow("transformed", WINDOW_NORMAL);
     //imshow("transformed", transformed);
 
+    //adaptiveThreshold( transformed, result, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 11, -2);
     threshold( transformed, result, THRESHOLD, 255, 0 );
     //namedWindow("result", WINDOW_NORMAL);
     //imshow("result", result);
@@ -86,33 +83,3 @@ void BirdsEyeView::performTransform()
     //namedWindow("unwarped", WINDOW_NORMAL);
     //imshow("unwarped", unwarped);
 }
-
-/*void BirdsEyeView::calibrate()
-{
-  //find lines, four points, use class FourPoints - find intersection
-    Mat edges;
-    Canny(src, edges, 50, 200, 3);
-    vector<Vec4i> lines;
-    HoughLinesP( edges, lines, 1, CV_PI/180, 80, 30, 10 );
-
-    vector <Vec4i> chosenLines;
-    int y = src.rows*2 / 3;
-    int xa = src.cols/4;
-    int xb = src.cols*3/4;
-    for(size_t i = 0; i < lines.size(); ++i)
-    {
-        if((lines[i][0]-lines[i][2])*(lines[i][0]-lines[i][2]) < 3*(lines[i][1]-lines[i][3])*(lines[i][1]-lines[i][3]) &&
-            lines[i][1] > y && lines[i][3] > y && lines[i][0] > xa && lines[i][2] > xa &&
-            lines[i][0] < xb && lines[i][2] < xb)
-            chosenLines.push_back(lines[i]);
-    }
-    Mat show;
-    src.copyTo(show);
-    for(size_t i = 0; i < chosenLines.size(); ++i)
-    {
-      line( show, Point(chosenLines[i][0], chosenLines[i][1]),
-          Point( chosenLines[i][2], chosenLines[i][3]), Scalar(128), 3, 8 );
-    }
-    namedWindow("lines", WINDOW_NORMAL);
-    imshow("lines", show);
-}*/

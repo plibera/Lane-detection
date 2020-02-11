@@ -3,182 +3,125 @@
 using namespace std;
 using namespace cv;
 
-Window::Window(Mat image) : FourPoints(Point(image.rows, image.cols))
+Window::Window(Mat image, Point center, int w, int h)
 {
     src = image;
-    hist = Mat::zeros(src.rows, src.cols, src.type());
+    srcLoaded = true;
+    w = max(0, w);
+    h = max(0, h);
+    topLeft = Point(center.x - w/2, center.y - h/2);
+    bottomRight = Point(topLeft.x + w, topLeft.y + h);
+    createHistogram();
 }
 
-Window::Window(Mat image, vector<Point> input) : FourPoints(input, Point(image.cols, image.rows))
+Window::Window(Point center, int w, int h)
 {
-    src = image;
-    hist = Mat::zeros(src.rows, src.cols, src.type());
+    srcLoaded = false;
+    w = max(0, w);
+    h = max(0, h);
+    topLeft = Point(center.x - w/2, center.y - h/2);
+    bottomRight = Point(topLeft.x + w, topLeft.y + h);
+    createHistogram();
 }
 
-Window::Window(Mat image, Point a, Point b, Point c, Point d) : FourPoints(a, b, c, d, Point(image.cols, image.rows))
+Window::Window(Mat image, Point a, Point b)
 {
     src = image;
-    hist = Mat::zeros(src.rows, src.cols, src.type());
+    srcLoaded = true;
+    topLeft = Point(min(a.x, b.x), min(a.y, b.y));
+    bottomRight = Point(max(a.x, b.x), max(a.y, b.y));
+    createHistogram();
+}
+
+Window::Window(Point a, Point b)
+{
+    srcLoaded = false;
+    topLeft = Point(min(a.x, b.x), min(a.y, b.y));
+    bottomRight = Point(max(a.x, b.x), max(a.y, b.y));
+    createHistogram();
 }
 
 Window::~Window()
 {}
 
-Point Window::polygonCentre(int index)
+bool Window::insideSrc(int x, int y)
 {
-  if(index < 0 || index >= points.size())
-    throw "Requested index outside of allocated memory";
-
-  Point result(0,0);
-  if(points.size() == 0)
-    return result;
-
-  result.x = (points[index]->point[0].x + points[index]->point[2].x) / 2;
-  result.y = (points[index]->point[0].y + points[index]->point[2].y) / 2;
-
-  return result;
+  if(!srcLoaded)
+    return false;
+  return x >= 0 && x < src.cols && y >= 0 && y < src.rows;
 }
 
-void Window::createHistograms()
+bool Window::insideSrc(Point p)
 {
-  vector <int> v;
-  histograms.clear();
-  for(unsigned i = 0; i < points.size(); ++i)
-  {
-    histograms.push_back(v);
-    createHistogram(i);
-  }
+  if(!srcLoaded)
+    return false;
+  return p.x >= 0 && p.x < src.cols && p.y >= 0 && p.y < src.rows;
 }
 
-void Window::createHistogram(int index)
+void Window::createHistogram()
 {
-  if(index < 0 || index >= histograms.size())
+  if(!srcLoaded)
     return;
-  if(index < 0 || index >= points.size())
-    return;
-
   int count = 0;
-  for(int x = points[index]->point[0].x; x < points[index]->point[2].x; ++x)
+  histogram.clear();
+  for(int x = topLeft.x; x <= bottomRight.x; ++x)
   {
     count = 0;
-    for(int y = points[index]->point[0].y; y < points[index]->point[2].y; ++y)
+    for(int y = topLeft.y; y <= bottomRight.y; ++y)
     {
+      if(!insideSrc(x, y))
+        continue;
       if(src.at<uchar>(Point(x, y)) == 255)
       {
         count++;
       }
     }
-    histograms[index].push_back(count);
+    histogram.push_back(count);
   }
 }
 
-vector<int> Window::getHistogram(int index)
+vector<int> Window::getHistogram()
 {
-  if(index < 0 || index >= histograms.size())
-    throw "Requested index outside of allocated memory";
-  vector<int> v;
-  if(histograms.size() == 0)
-    return v;
-  v = histograms[index];
-  return v;
+  return histogram;
 }
 
-vector<vector<int> > Window::getHistograms()
+void Window::setCenter(cv::Point center)
 {
-  vector<vector<int> > v = histograms;
-  return v;
-}
-
-Mat Window::histToImg(int index)
-{
-  if(index < 0 || index >= histograms.size())
-    throw "Requested index outside of allocated memory";
-
-  if(histograms.size() == 0 || histograms[index].size() == 0)
-  {
-    Mat a;
-    return a;
-  }
-  int maxVal = *max_element(histograms[index].begin(), histograms[index].end());
-  maxVal = max(1, maxVal);
-  int limit = hist.rows;
-
-  vector<int> valuesToShow;
-  vector<int>::iterator valuesIt = valuesToShow.end();
-  for(vector<int>::iterator it = histograms[index].begin(); it != histograms[index].end(); ++it)
-  {
-    valuesToShow.push_back(*it * limit / maxVal);
-    *valuesIt = limit - *valuesIt;
-    valuesIt++;
-  }
-  hist = Mat::zeros(limit, histograms[index].size(), src.type());
-  for(unsigned int x = 0; x < hist.cols; ++x)
-  {
-    for(unsigned int y = 0; y < hist.rows; ++y)
-    {
-      if(y <= valuesToShow[x])
-        hist.at<uchar>(Point(x, y)) = 0;
-      else
-        hist.at<uchar>(Point(x, y)) = 255;
-    }
-  }
-
-  return hist;
-}
-
-void Window::setWindowCentres(vector<cv::Point> centres)
-{
-  for(int i = 0; i < min(centres.size(), points.size()); ++i)
-  {
-    setWindowCentre(i, centres[i]);
-  }
-}
-
-void Window::setWindowCentre(int index, cv::Point centre)
-{
-  if(index < 0 || index >= points.size())
-    return;
-
-  int width = points[index]->point[2].x - points[index]->point[0].x;
-  int height = points[index]->point[2].y - points[index]->point[0].y;
-
-  if(centre.x - width/2 < 0) centre.x = width/2;
-  if(centre.x + width/2 >= src.cols) centre.x = src.cols-1-width/2;
-  if(centre.y - height/2 < 0) centre.y = height/2;
-  if(centre.y + height/2 >= src.rows) centre.y = src.rows-1-height/2;
-
-  points[index]->point[0].x = centre.x - width/2;
-  points[index]->point[1].x = centre.x + width/2;
-  points[index]->point[2].x = centre.x + width/2;
-  points[index]->point[3].x = centre.x - width/2;
-  points[index]->point[0].y = centre.y - height/2;
-  points[index]->point[1].y = centre.y - height/2;
-  points[index]->point[2].y = centre.y + height/2;
-  points[index]->point[3].y = centre.y + height/2;
-}
-
-vector<Point> Window::getWindowCentres()
-{
-  vector<Point> v;
-  for(unsigned int i = 0; i < points.size(); ++i)
-  {
-    v.push_back(this->polygonCentre(i));
-  }
-  return v;
-}
-
-Point Window::getWindowCentre(int index)
-{
-  if(index < 0 || index >= histograms.size())
-    throw "Requested index outside of allocated memory";
-  if(histograms.size() == 0) return Point(0,0);
-
-  return this->polygonCentre(index);
+  int h = height();
+  int w = width();
+  topLeft = Point(center.x - w/2, center.y - h/2);
+  bottomRight = Point(topLeft.x + w, topLeft.y + h);
+  createHistogram();
 }
 
 void Window::setInput(Mat image)
 {
   src = image;
-  hist = Mat::zeros(src.rows, src.cols, src.type());
-  setBoundaries(Point(src.cols, src.rows));
+  srcLoaded = true;
+  createHistogram();
+}
+
+int Window::height()
+{
+  return bottomRight.y - topLeft.y;
+}
+
+int Window::width()
+{
+  return bottomRight.x - topLeft.x;
+}
+
+cv::Point Window::center()
+{
+  return Point((bottomRight.x+topLeft.x)/2, (bottomRight.y+topLeft.y)/2);
+}
+
+cv::Point Window::getTopLeft()
+{
+  return topLeft;
+}
+
+cv::Point Window::getBottomRight()
+{
+  return bottomRight;
 }

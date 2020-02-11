@@ -2,13 +2,16 @@
 #define POLYFIT_H
 
 #include <opencv2/opencv.hpp>
-#include "Polynomial.h"
+#include <vector>
 
+#define DEGREE 2
+
+double value(int x, std::vector<double> coeffs);
 
 class PolyFit
 {
   std::vector<cv::Point> input;
-  Polynomial <double> output;
+  std::vector<double> output;
 
 public:
   PolyFit();
@@ -17,7 +20,7 @@ public:
 
   void setInput(std::vector<cv::Point> in);
 
-  Polynomial<double> solve();
+  std::vector<double> solve();
 };
 
 

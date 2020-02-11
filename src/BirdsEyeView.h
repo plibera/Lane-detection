@@ -2,12 +2,11 @@
 #define BIRDSEYEVIEW_H
 
 #include <opencv2/opencv.hpp>
-#include "opencv2/highgui.hpp"
-#include "opencv2/imgproc.hpp"
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
 #include <stdio.h>
-#include "FourPoints.h"
 
-#define THRESHOLD 100
+#define THRESHOLD 150
 
 class BirdsEyeView
 {
@@ -18,7 +17,7 @@ private:
     cv::Mat unwarped;
     bool inputSet;
 
-    FourPoints roi;//corners of the road roi
+    std::vector<cv::Point> roi;//corners of the road roi
 
     void performTransform();
 
@@ -36,7 +35,8 @@ public:
     //lines to perform calibration on
     void setRoi(std::vector<cv::Point> roiCorners);
 
-    //void calibrate();
+    //TODO: void calibrate();
+    //automatic calibration
 };
 
 
